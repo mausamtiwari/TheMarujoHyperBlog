@@ -1,4 +1,4 @@
-package be.intec.themarujohyperblog.Repository;
+package be.intec.themarujohyperblog.repository;
 
 import org.springframework.stereotype.Repository;
 
