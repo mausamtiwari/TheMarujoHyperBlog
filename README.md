@@ -1,4 +1,4 @@
-# Majuro - The hyper blog
+# Marujo - The Hyper Blog
 
 ![Java](https://img.shields.io/badge/Java-F9981D?style=for-the-badge&logo=java&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB5D?style=for-the-badge&logo=springboot&logoColor=white)
