@@ -1,4 +1,4 @@
-package be.intec.themarujohyperblog.Model;
+package be.intec.themarujohyperblog.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package be.intec.themarujohyperblog.Service;
+package be.intec.themarujohyperblog.service;
 
 public class CommentServiceImpl implements CommentService{
 }
