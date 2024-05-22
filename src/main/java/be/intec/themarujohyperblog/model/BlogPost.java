@@ -1,4 +1,4 @@
-package be.intec.themarujohyperblog.Model;
+package be.intec.themarujohyperblog.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
