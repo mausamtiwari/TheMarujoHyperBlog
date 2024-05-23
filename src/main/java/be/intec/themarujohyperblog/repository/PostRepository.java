@@ -6,4 +6,5 @@ import be.intec.themarujohyperblog.model.BlogPost;
 
 @Repository
 public interface PostRepository extends JpaRepository<BlogPost,Long> {
+
 }
