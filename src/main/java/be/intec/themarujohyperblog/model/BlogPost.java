@@ -15,16 +15,28 @@ public class BlogPost extends AuditModel {
     @Column(nullable = false)
     private String title;
 
+    /* Description voorlopig weggelaten. In versie 2.0 kan dit dienen voor tags
+    @NotNull
+    @Column(nullable = true) // description is niet verplicht
+    private String description;
+
+     */
+
+
     @Lob
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false) //To-check:  relatie OTM or MTO?
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+
+
     // Default constructor
-    public BlogPost() {}
+    public BlogPost() {
+    }
 
     // Constructor with all fields
     public BlogPost(Long id, @NotNull String title, String content, User user) {
@@ -66,11 +78,11 @@ public class BlogPost extends AuditModel {
         this.content = content;
     }
 
-    public User getuser() {
+    public User getUser() {
         return user;
     }
 
-    public void setuser(User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 }
