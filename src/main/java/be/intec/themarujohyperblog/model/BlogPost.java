@@ -27,14 +27,16 @@ public class BlogPost extends AuditModel {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false) //To-check:  relatie?
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false) //To-check:  relatie OTM or MTO?
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
 
 
     // Default constructor
-    public BlogPost() {}
+    public BlogPost() {
+    }
 
     // Constructor with all fields
     public BlogPost(Long id, @NotNull String title, String content, User user) {
@@ -76,11 +78,11 @@ public class BlogPost extends AuditModel {
         this.content = content;
     }
 
-    public User getuser() {
+    public User getUser() {
         return user;
     }
 
-    public void setuser(User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 }
