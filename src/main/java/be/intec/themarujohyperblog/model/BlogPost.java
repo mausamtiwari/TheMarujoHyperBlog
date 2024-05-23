@@ -15,13 +15,24 @@ public class BlogPost extends AuditModel {
     @Column(nullable = false)
     private String title;
 
+    /* Description voorlopig weggelaten. In versie 2.0 kan dit dienen voor tags
+    @NotNull
+    @Column(nullable = true) // description is niet verplicht
+    private String description;
+
+     */
+
+
     @Lob
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)//Double check OneToMany or ManyToOne !!
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false) //To-check:  relatie OTM or MTO?
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+
 
     // Default constructor
     public BlogPost() {
