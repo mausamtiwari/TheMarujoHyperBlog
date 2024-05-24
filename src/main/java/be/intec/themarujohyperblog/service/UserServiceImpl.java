@@ -46,4 +46,6 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(pageNo-1, pageSize);
         return this.userRepository.findAll(pageable);
     }
+
+
 }
