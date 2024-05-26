@@ -49,8 +49,8 @@ spring:
             client-secret: ${GOOGLE_CLIENT_SECRET}
 
           github:
-            client-id: ${GITHUB_CLIENT_ID}
-            client-secret: ${GITHUB_CLIENT_SECRET}
+            client-id: ${GOOGLE_CLIENT_SECRET}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
 
   thymeleaf:
     prefix: classpath:/templates/

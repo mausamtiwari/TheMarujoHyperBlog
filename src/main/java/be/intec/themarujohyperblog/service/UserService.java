@@ -2,6 +2,7 @@ package be.intec.themarujohyperblog.service;
 
 
 import be.intec.themarujohyperblog.model.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,10 @@ public interface UserService {
     Optional<User> findByUserName(String username);
 
     Optional<User> findUserById(Long userid);
+
+    Optional<User> findByUserNameAndPassword(String username, String password);
+
+   // UserDetails loadUserByUsername(String username);
 
 
 

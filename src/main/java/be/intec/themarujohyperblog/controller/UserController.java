@@ -4,7 +4,7 @@ import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,6 +24,7 @@ public class UserController {
 
     private final UserService userService;
 
+
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
@@ -36,31 +37,58 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("user") User user) {
-        System.out.println(user);
-        /*String hashedPassword = BCrypt.hashpw(user.getPassword(),BCrypt.gensalt(12));
-        user.setPassword(hashedPassword);*/
+    public String registerUser(@Valid @ModelAttribute("user") User user, Model model) {
+        System.out.println("Registering user: " + user);
+        Optional<User> existingUser = userService.findByUserName(user.getUsername());
+        if (existingUser.isPresent()) {
+            model.addAttribute("error", "Username already exists");
+            return "register";
+        }
+
         userService.registerUser(user);
         System.out.println("User registered with username: " + user.getUsername());
         return "redirect:/login";
     }
-
     @GetMapping("/login")
-    public String showLoginForm() {
+    public String showLoginForm(Model model) {
+        model.addAttribute("user", new User());
         return "login";
     }
 
+    /*@PostMapping("/login")
+    public String login(@ModelAttribute User user) {
+        Optional<User> userAuth = userService.findByUserNameAndPassword(user.getUsername(), user.getPassword());
+        System.out.println(userAuth);
+        if (Objects.nonNull(userAuth)) {
+            return "redirect:/";
+        } else {
+            return "redirect:/login";
+        }
+
+    }*/
+
+
+
     @PostMapping("/login")
     public String login(@RequestParam("username") String username, @RequestParam("password") String password, Model model) {
+        System.out.println("Attempting to login with username: " + username);
         Optional<User> userOptional = userService.findByUserName(username);
-        if (userOptional.isEmpty() || !password.equals(userOptional.get().getPassword())) {
+        if (userOptional.isEmpty()) {
+            System.out.println("User not found");
             model.addAttribute("error", "Invalid username or password");
             return "login";
         }
-        model.addAttribute("user", userOptional.get());
-        return "redirect:/blogcentral";
-
+        User user = userOptional.get();
+        if (!password.equals(user.getPassword())) {
+            System.out.println("Password does not match");
+            model.addAttribute("error", "Invalid username or password");
+            return "login";
+        }
+        System.out.println("User logged in successfully");
+        model.addAttribute("user", user);
+        return "blogcentral";
     }
+
 
    /* @PostMapping("/login")
     public String login(@RequestParam("username") String username, @RequestParam("password") String password, Model model) {
@@ -73,7 +101,7 @@ public class UserController {
         return "redirect:/blogcentral";
     }*/
 
-    @GetMapping("/profile/{id}")
+    /*@GetMapping("/profile/{id}")
     public String viewUserProfile(@PathVariable("id") Long id, Model model) {
         Optional<User> optionalUser = userService.findUserById(id);
         if (optionalUser.isEmpty()) {
@@ -82,6 +110,7 @@ public class UserController {
         model.addAttribute("user", optionalUser.get());
         return "profile";
     }
+
 
     @GetMapping("/edit/{id}")
     public String showEditProfileForm(@PathVariable("id") Long id, Model model) {
@@ -141,5 +170,5 @@ public class UserController {
             e.printStackTrace();
         }
         return "redirect:/profile/" + id;
-    }
+    }*/
 }

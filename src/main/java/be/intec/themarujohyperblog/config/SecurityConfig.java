@@ -18,7 +18,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authorizeRequests ->
+                /*.authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/", "/register", "/login", "/search", "/css/**", "/js/**").permitAll()
                                 .anyRequest().authenticated()
@@ -29,7 +29,7 @@ public class SecurityConfig {
                                 .permitAll()
                 )
                 .logout(LogoutConfigurer::permitAll
-                )
+                )*/
                 .oauth2Login(oauth2Login ->
                         oauth2Login
                                 .loginPage("/login")
