@@ -45,11 +45,13 @@ spring:
       client:
         registration:
           google:
-            client-id: 514051386784-i4n1leb6rjk8h5hbovtnfquhlb4o0as1.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+
           github:
-            client-id: Iv23li3nWCIgsN6jc4Y4
-            client-secret: 34cda707ce8f034449684c050c8e56263277f240
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
