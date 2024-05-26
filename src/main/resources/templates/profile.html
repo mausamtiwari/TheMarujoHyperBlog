@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Profile</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h2>User Profile</h2>
+    <div>
+        <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+        <div th:if="${user.profilePicture != null}">
+            <img th:src="@{'/uploads/' + ${user.profilePicture}}" alt="Profile Picture" class="img-thumbnail" />
+            <form th:action="@{/delete-picture/{id}(id=${user.id})}" method="post">
+                <button type="submit" class="btn btn-danger">Delete Picture</button>
+            </form>
+        </div>
+        <div th:if="${user.profilePicture == null}">
+            <form th:action="@{/upload/{id}(id=${user.id})}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">Upload Profile Picture:</label>
+                    <input type="file" class="form-control" id="file" name="file" />
+                </div>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+        </div>
+        <a th:href="@{/edit/{id}(id=${user.id})}" class="btn btn-secondary">Edit Profile</a>
+        <form th:action="@{/delete/{id}(id=${user.id})}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger">Delete Profile</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

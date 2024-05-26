@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+        }
+        .btn-social {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .btn-social img {
+            margin-right: 10px;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ccc;
+        }
+        .divider:not(:empty)::before {
+            margin-right: .25em;
+        }
+        .divider:not(:empty)::after {
+            margin-left: .25em;
+        }
+    </style>
+</head>
+<body>
+<div class="container login-container">
+    <h2 class="text-center">Welcome back</h2>
+    <form th:action="@{/login}" th:object="${user}" method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text"  class="form-control" id="username" name="username" placeholder="Username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password"  class="form-control" id="password" name="password" placeholder="password" required>
+        </div>
+        <button type="submit" class="btn btn-success btn-block" th:href="@{/blogcentral}" >Continue</button>
+        <div class="text-center mt-3">
+            <p>Don't have an account? <a th:href="@{/register}">Sign Up</a></p>
+        </div>
+        <div class="divider my-4">OR</div>
+        <a th:href="@{/oauth2/authorization/google}" class="btn btn-light btn-block btn-social">
+            <img src="https://img.icons8.com/color/16/000000/google-logo.png" alt="Google Logo"/> Continue with Google
+        </a>
+        <a th:href="@{/oauth2/authorization/github}" class="btn btn-light btn-block btn-social">
+            <img src="https://img.icons8.com/color/16/000000/microsoft.png" alt="Microsoft Logo"/> Continue with GitHub
+        </a>
+    </form>
+</div>
+
+<!-- Bootstrap JS and dependencies (Optional) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+

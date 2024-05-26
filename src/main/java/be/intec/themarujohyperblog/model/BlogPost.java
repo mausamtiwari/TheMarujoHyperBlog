@@ -3,6 +3,8 @@ package be.intec.themarujohyperblog.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 @Entity
 @Table(name = "blog_post")
 public class BlogPost extends AuditModel {
@@ -19,9 +21,15 @@ public class BlogPost extends AuditModel {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BlogComment> comments;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes;
 
     // Default constructor
     public BlogPost() {}
@@ -66,11 +74,27 @@ public class BlogPost extends AuditModel {
         this.content = content;
     }
 
-    public User getuser() {
+    public User getUser() {
         return user;
     }
 
-    public void setuser(User user) {
+    public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<BlogComment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<BlogComment> comments) {
+        this.comments = comments;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
     }
 }

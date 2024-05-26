@@ -1,8 +1,9 @@
 package be.intec.themarujohyperblog.repository;
 
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface PostRepository {
+import be.intec.themarujohyperblog.model.BlogPost;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PostRepository extends JpaRepository<BlogPost, Long> {
 
 }

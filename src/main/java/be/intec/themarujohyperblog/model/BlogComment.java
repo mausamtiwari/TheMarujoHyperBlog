@@ -1,6 +1,5 @@
 package be.intec.themarujohyperblog.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.OnDelete;
@@ -19,33 +18,32 @@ public class BlogComment extends AuditModel {
     private String text;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "blog_post_id", nullable = false)
+    @JoinColumn(name = "post_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private BlogPost blogPost;
+    private BlogPost post;
+
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     // Default constructor
-    public BlogComment() {}
+    public BlogComment() {
+    }
 
     // Constructor with all fields
-    public BlogComment(Long id, @NotNull String text, BlogPost blogPost) {
+    public BlogComment(Long id, @NotNull String text, BlogPost post) {
         this.id = id;
         this.text = text;
-        this.blogPost = blogPost;
+        this.post = post;
     }
 
     // Constructor without id
-    public BlogComment(@NotNull String text, BlogPost blogPost) {
+    public BlogComment(@NotNull String text, BlogPost post) {
         this.text = text;
-        this.blogPost = blogPost;
+        this.post = post;
     }
 
-    // Constructor with text only
-    public BlogComment(@NotNull String text) {
-        this.text = text;
-    }
-
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -62,11 +60,19 @@ public class BlogComment extends AuditModel {
         this.text = text;
     }
 
-    public BlogPost getBlogPost() {
-        return blogPost;
+    public BlogPost getPost() {
+        return post;
     }
 
-    public void setBlogPost(BlogPost blogPost) {
-        this.blogPost = blogPost;
+    public void setPost(BlogPost post) {
+        this.post = post;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

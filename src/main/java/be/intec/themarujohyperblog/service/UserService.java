@@ -2,18 +2,23 @@ package be.intec.themarujohyperblog.service;
 
 
 import be.intec.themarujohyperblog.model.User;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     List<User> getAllUsers();
 
-    void saveUser(User user);
+    void registerUser(User user);
 
-    void editUser(Long userId);
+    public User updateUser(User user);
 
     void deleteUser(Long userId);
 
-    Page<User> findUserPaginated(Long userId, int pageNo, int pageSize);
+    Optional<User> findByUserName(String username);
+
+    Optional<User> findUserById(Long userid);
+
+
+
 }
