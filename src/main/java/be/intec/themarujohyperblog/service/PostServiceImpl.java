@@ -3,7 +3,6 @@ package be.intec.themarujohyperblog.service;
 import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +51,25 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public Page<BlogPost> findPostPaginated(int pageNo, int pageSize) {
+        //Default versie, afnemende volgorde
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
+        //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
+        return this.postRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<BlogPost> findPostPaginatedByIDUp(int pageNo, int pageSize) {
+        //Sorteert by ID in toenemende volgorde
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
+        //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
+        return this.postRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<BlogPost> findPostPaginatedByIDDown(int pageNo, int pageSize) {
+        //Sorteert by ID in afnemende volgorde
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
         //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.

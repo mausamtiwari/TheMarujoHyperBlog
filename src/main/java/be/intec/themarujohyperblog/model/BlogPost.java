@@ -15,12 +15,12 @@ public class BlogPost extends AuditModel {
     @Column(nullable = false)
     private String title;
 
-    /* Description voorlopig weggelaten. In versie 2.0 kan dit dienen voor tags
+
     @NotNull
-    @Column(nullable = true) // description is niet verplicht
+    @Column(nullable = true) // description toegevegd, anders is het moeilijk een search te doen op inhoud.
     private String description;
 
-     */
+
 
 
     @Lob
@@ -39,7 +39,16 @@ public class BlogPost extends AuditModel {
     }
 
     // Constructor with all fields
-    public BlogPost(Long id, @NotNull String title, String content, User user) {
+    public BlogPost(Long id, @NotNull String title, String description, String content, User user) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.content = content;
+        this.user = user;
+    }
+
+    // Constructor zonder description
+    public BlogPost(Long id, @NotNull String title,String content, User user) {
         this.id = id;
         this.title = title;
         this.content = content;
