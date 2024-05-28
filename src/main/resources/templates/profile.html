@@ -5,11 +5,17 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Optional custom CSS for sidebar styling */
-        .sidebar {
-            background-color: #f8f9fa;
+        .sidebar-container {
+            background-color: lightblue; /* Set background color for sidebar container */
             padding: 15px;
             height: 100vh;
             position: fixed;
+            top: 0;
+            left: 0;
+            width: 200px; /* Adjust based on sidebar width */
+        }
+        .sidebar {
+            height: 100%;
         }
         .sidebar a {
             color: #333;
@@ -30,11 +36,13 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-md-3 sidebar">
-            <h4>Navigation</h4>
-            <a href="/">Home</a>
-            <a href="/blogcentral.html">BlogCentral</a>
-            <!-- Add more links as needed -->
+        <div class="col-md-3 sidebar-container">
+            <div class="sidebar">
+                <h4>Navigation</h4>
+                <a href="/">Home</a>
+                <a href="/blogcentral.html">BlogCentral</a>
+                <!-- Add more links as needed -->
+            </div>
         </div>
 
         <!-- Main content -->
