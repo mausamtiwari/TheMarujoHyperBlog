@@ -115,7 +115,7 @@ public class PostController {
 
     @PostMapping("/search") //search for posts where the description contains a particular word
     public String searchPost(@ModelAttribute("search") String search, Model model) {
-        List<BlogPost> postList = postService.searchPostDescription(search);
+        Page<BlogPost> postList = postService.searchPostDescription(search);
         model.addAttribute("postList", postList);
         return "redirect:/searchResults";
     }
