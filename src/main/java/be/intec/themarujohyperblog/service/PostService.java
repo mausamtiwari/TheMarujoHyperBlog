@@ -14,5 +14,7 @@ public interface PostService {
     Page<BlogPost> findPostPaginated(int pageNo, int pageSize);
     Page<BlogPost> findPostPaginatedByIDUp(int pageNo, int pageSize);
     Page<BlogPost> findPostPaginatedByIDDown(int pageNo, int pageSize);
+
+    Page<BlogPost> searchPostDescription(String search);
 }
 

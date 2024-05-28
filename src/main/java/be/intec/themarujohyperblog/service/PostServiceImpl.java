@@ -75,5 +75,10 @@ public class PostServiceImpl implements PostService{
         //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
         return this.postRepository.findAll(pageable);
     }
+
+    @Override
+    public Page<BlogPost> searchPostDescription(String search) {
+        return postRepository.findByDescriptionContaining(search, PageRequest.of(0, 6));
+    }
 }
 
