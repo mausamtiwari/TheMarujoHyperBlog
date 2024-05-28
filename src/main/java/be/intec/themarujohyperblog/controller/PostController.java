@@ -71,15 +71,26 @@ public class PostController {
 
     @GetMapping("/page/{pageNo}")
     public String findPostPaginated(@PathVariable(value = "pageNo") int pageNo, Model model) {
-        int pageSize = 6; //aantal posts op één pagina is 6;
+        int pageSize = 6; // Number of posts per page
         Page<BlogPost> page = postService.findPostPaginated(pageNo, pageSize);
-        List<BlogPost> postList = page.getContent(); //komt van springframework.data.domain.Page
+        List<BlogPost> postList = page.getContent(); // Get list of posts from the page
+
+        // Add pagination attributes to the model
         model.addAttribute("currentPage", pageNo);
         model.addAttribute("totalPages", page.getTotalPages());
-        model.addAttribute("totalItems", page.getTotalElements()); //totaal aantal elementen op pagina
+        model.addAttribute("totalItems", page.getTotalElements());
+
+        // Add the list of posts to the model
         model.addAttribute("postList", postList);
-        return "index";
+
+        // Add author information
+        model.addAttribute("userName", "Your User Name");
+        //model.addAttribute("userAvatar", "path/to/your/avatar.jpg");
+
+        return "bloghome"; // Render the bloghome.html template
     }
 
-    }
+
+
+}
 

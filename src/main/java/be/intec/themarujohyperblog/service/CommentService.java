@@ -13,4 +13,3 @@ public interface CommentService {
     void deleteCommentById(Long id);
     Page<BlogComment> findCommentPaginated(Long postId, int pageNo, int pageSize);
 }
-

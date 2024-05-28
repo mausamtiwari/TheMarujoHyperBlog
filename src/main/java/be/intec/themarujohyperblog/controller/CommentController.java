@@ -15,8 +15,8 @@ import java.util.List;
 @Controller
 public class CommentController {
 
-    private CommentServiceImpl commentService;
-    private PostServiceImpl postService;
+    private final CommentServiceImpl commentService;
+    private final PostServiceImpl postService;
 
 
     @Autowired
@@ -40,7 +40,7 @@ public class CommentController {
         model.addAttribute("commentList", commentList);
 
         // Fetches the post to which comments belong and adds to the model
-        BlogPost post = postService.getPostById(postId);
+        BlogPost post = postService.getPost(postId);
         model.addAttribute("blog_post", post);
         model.addAttribute("comment", new BlogComment());
         return "blog_comment";
@@ -50,7 +50,7 @@ public class CommentController {
     @PostMapping("/blog_post/{blogpostId}/blog_comment")
     public String createComment(@PathVariable(value = "blogpostId") Long postId,
                                 @ModelAttribute("comment") BlogComment comment) {
-        BlogPost post = postService.getPostById(postId);
+        BlogPost post = postService.getPost(postId);
         // Associates the comment with the post
         comment.setBlogPost(post);
         commentService.saveComment(comment);
