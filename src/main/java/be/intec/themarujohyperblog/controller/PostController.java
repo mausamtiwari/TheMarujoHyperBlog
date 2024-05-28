@@ -98,6 +98,7 @@ import be.intec.themarujohyperblog.model.Like;
 import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.service.*;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -140,22 +141,59 @@ public class PostController {
         }
     }
 */
-    @GetMapping("/showNewPostForm")
-    public String showCreatePostForm(Model model) {
-        BlogPost post = new BlogPost();
-        model.addAttribute("post", post);
-        return "createpost";
-    }
+   @GetMapping("/showNewPostForm")
+   public String showCreatePostForm(Model model, HttpSession session) {
+       User user = (User) session.getAttribute("loggedInUser");
+       if (user == null) {
+           return "redirect:/login";
+       }
+
+       BlogPost post = new BlogPost();
+       model.addAttribute("post", post);
+       return "createpost";
+   }
 
     @PostMapping("/createPost")
-    public String savePost(BlogPost post) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
+    public String createPost(@ModelAttribute("post") BlogPost post, HttpSession session) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            throw new IllegalArgumentException("Invalid user session");
+        }
+
         post.setUser(user);
         postService.savePost(post);
         return "redirect:/";
     }
 
+    /*  @GetMapping("/showNewPostForm")
+   public String showNewPostForm(Model model) {
+       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       if (authentication != null && authentication.isAuthenticated() && !authentication.getName().equals("anonymousUser")) {
+           String username = authentication.getName();
+           User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
+           model.addAttribute("user", user);
+       } else {
+           return "createpost";
+       }
+
+       BlogPost post = new BlogPost();
+       model.addAttribute("post", post);
+       return "createpost";
+   }
+
+    @PostMapping("/createPost")
+    public String createPost(@ModelAttribute("post") BlogPost post) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getName().equals("anonymousUser")) {
+            throw new IllegalArgumentException("Invalid username: anonymousUser");
+        }
+
+        String username = authentication.getName();
+        User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
+        post.setUser(user);
+        postService.savePost(post);
+        return "afterlogin";
+    }*/
     @GetMapping("/updatePost/{id}")
     public String showUpdatePostForm(@PathVariable("id") Long postId, Model model) {
         BlogPost post = postService.getPostById(postId);

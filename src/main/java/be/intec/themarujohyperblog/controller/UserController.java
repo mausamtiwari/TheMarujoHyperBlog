@@ -10,10 +10,14 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -49,7 +54,8 @@ public class UserController {
         return "register";
     }
 
-    // Password confirmation validation error
+    // TODO PasswordMatchesValidator bug fix
+    // Password confirmation validation error .
    /* @PostMapping("/register")
     public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, Model model, BindingResult result) {
         // System.out.println("Registering user: " + user);
@@ -99,29 +105,35 @@ public class UserController {
     }*/
 
     @PostMapping("/register")
-    public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, Model model, BindingResult result) {
-        // System.out.println("Registering user: " + user);
+    public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
         logger.info("Registering user: {}", user);
 
         // Check for validation errors
         if (result.hasErrors()) {
-            result.getAllErrors().forEach(error -> logger.warn("Validation error: {}", error));
-            model.addAttribute("error", "Validation failed");
-            return "redirect:/register";
+            for (FieldError error : result.getFieldErrors()) {
+                logger.warn("Validation error: field: {}, message: {}", error.getField(), error.getDefaultMessage());
+                // Check if the error is related to the password field
+                if ("password".equals(error.getField())) {
+                    logger.warn("Password validation error: {}", error.getDefaultMessage());
+                    model.addAttribute("passwordError", error.getDefaultMessage());
+                }
+            }
+            model.addAttribute("user", user);
+            return "register";
         }
 
         Optional<User> existingUserName = userService.findByUserName(user.getUsername());
         if (existingUserName.isPresent()) {
             logger.warn("User already exists: {}", username);
             model.addAttribute("error", "Username already exists");
-            return "/register";
+            return "register";
         }
 
         Optional<User> existingEmail = userService.findUserByEmail(user.getEmail());
         if (existingEmail.isPresent()) {
             logger.warn("User already exists with email: {}", existingEmail);
             model.addAttribute("error", "Email already exists");
-            return "/register";
+            return "register";
         }
 
         // Check for password match
@@ -129,15 +141,14 @@ public class UserController {
         if (!isValid) {
             logger.warn("Passwords do not match");
             model.addAttribute("error", "Passwords do not match");
-            return "/register";
+            return "register";
         }
 
         // Register user if all checks pass
         userService.registerUser(user);
         logger.info("User registered with username: {}", user.getUsername());
-        return "/login";
+        return "redirect:/login";
     }
-
 
     @GetMapping("/login")
     public String showLoginForm(@RequestParam(value = "error", required = false) String error, Model model) {
@@ -153,7 +164,14 @@ public class UserController {
         logger.info("Attempting to login with username: {}", username);
         //System.out.println("Attempting to login with username: " + username);
         Optional<User> userOptional = userService.findByUserName(username);
-        if (userOptional.isEmpty() || (!password.equals(userOptional.get().getPassword()))) {
+        if (userOptional.isEmpty()) {
+            logger.warn("User not found in database: {}", username);
+            // System.out.println("Invalid login credentials.");
+            model.addAttribute("error", "User not found in database");
+            model.addAttribute("user", new User());
+            return "login";
+        }
+        if (!password.equals(userOptional.get().getPassword())) {
             logger.warn("Invalid login credentials for username: {}", username);
             // System.out.println("Invalid login credentials.");
             model.addAttribute("error", "Invalid username or password");
@@ -166,6 +184,11 @@ public class UserController {
         // System.out.println(username + " logged in successfully");
         model.addAttribute("user", user);
         return "afterlogin";
+    }
+
+    @GetMapping("/user")
+    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
+        return principal.getAttributes();
     }
 
 
@@ -210,6 +233,7 @@ public class UserController {
         }
         Optional<User> existingUser = userService.findUserById(id);
         if (existingUser.isEmpty()) {
+            logger.error("User with id {} not found", id);
             model.addAttribute("error", "User not found.");
             return "error";
         }
@@ -221,8 +245,8 @@ public class UserController {
         updatedUser.setPassword(user.getPassword());
         updatedUser.setConfirmPassword(user.getConfirmPassword());
 
-        userService.updateUser(updatedUser);
-        return "redirect:/profile/" + id;
+        userService.registerUser(updatedUser);
+        return "redirect:/profile";
     }
 
     @PostMapping("/user/delete/{id}")
@@ -290,6 +314,7 @@ public class UserController {
         session.invalidate();
         return "redirect:/login?logout";
     }
+
 
 }
 
