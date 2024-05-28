@@ -19,6 +19,7 @@ public interface UserService {
     Optional<User> findByUserName(String username);
 
     Optional<User> findUserById(Long userid);
+    Optional<User> findUserByEmail(String email);
 
     Optional<User> findByUserNameAndPassword(String username, String password);
 

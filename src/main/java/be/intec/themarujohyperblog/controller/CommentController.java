@@ -27,6 +27,7 @@ public class CommentController {
         this.userService = userService;
     }
 
+    //Handles GET request for displaying all comments for a specific post
     @GetMapping("/blog_post/{blogpostId}/blog_comment")
     public String getAllCommentsByPostId(@PathVariable(value = "blogpostId") Long postId,
                                          @RequestParam(name = "page", defaultValue = "1") int pageNo,
@@ -76,40 +77,5 @@ public class CommentController {
         commentService.deleteCommentById(commentId);
         return "redirect:/blog_post/" + postId + "/blog_comment";
     }
-   /* @PostMapping("/comments")
-    public String saveComment(@RequestParam Long postId, @RequestParam String content) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
 
-        BlogPost post = postService.findById(postId);
-
-        BlogComment comment = new BlogComment();
-        comment.setCreatedAt(new Date());
-        comment.setUser(user);
-        comment.setPost(post);
-
-        commentService.saveComment(comment);
-        return "redirect:/posts/" + postId;
-    }*/
-
-    /*@GetMapping("/edit-comment/{id}")
-    public String editComment(@PathVariable Long id, Model model) {
-        BlogComment comment = commentService.findCommentById(id);
-        model.addAttribute("comment", comment);
-        return "edit_comment";
-    }
-
-    @PostMapping("/edit-comment/{id}")
-    public String updateComment(@PathVariable Long id, @RequestParam String content) {
-        BlogComment comment = commentService.findCommentById(id);
-        commentService.saveComment(comment);
-        return "redirect:/posts/" + comment.getPost().getId();
-    }
-
-    @GetMapping("/delete-comment/{id}")
-    public String deleteComment(@PathVariable Long id) {
-        BlogComment comment = commentService.findCommentById(id);
-        commentService.deleteComment(comment);
-        return "redirect:/posts/" + comment.getPost().getId();
-    }*/
 }

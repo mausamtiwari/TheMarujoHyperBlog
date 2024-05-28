@@ -1,6 +1,6 @@
 package be.intec.themarujohyperblog.model;
 
-import be.intec.themarujohyperblog.config.PasswordMatches;
+//import be.intec.themarujohyperblog.config.PasswordMatches;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@PasswordMatches
+//@PasswordMatches
 public class User {
 
     @Id
