@@ -1,7 +1,6 @@
 package be.intec.themarujohyperblog.controller;
 
 import be.intec.themarujohyperblog.model.BlogPost;
-import be.intec.themarujohyperblog.service.PostService;
 import be.intec.themarujohyperblog.service.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,9 +10,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -78,7 +74,7 @@ public class PostController {
         model.addAttribute("totalPages", page.getTotalPages());
         model.addAttribute("totalItems", page.getTotalElements()); //totaal aantal elementen op pagina
         model.addAttribute("postList", postList);
-        return "index";
+        return "blogcentral";
     }
 
     }
