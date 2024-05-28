@@ -1,7 +1,6 @@
 package be.intec.themarujohyperblog.controller;
 
 import be.intec.themarujohyperblog.model.BlogPost;
-import be.intec.themarujohyperblog.service.PostService;
 import be.intec.themarujohyperblog.service.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,9 +10,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -30,6 +26,7 @@ public class PostController {
     @GetMapping("/")  //root, eerste pagina
     public String viewHomePage(Model model) {
         return findPostPaginated(1,model); //dit beperkt ons tot 1 pagina?
+
     }
 
     @GetMapping("/showNewPostForm") // dit toont de pagina om een
@@ -83,12 +80,9 @@ public class PostController {
         // Add the list of posts to the model
         model.addAttribute("postList", postList);
 
-        // Add author information
-        model.addAttribute("userName", "Your User Name");
-        //model.addAttribute("userAvatar", "path/to/your/avatar.jpg");
-
-        return "bloghome"; // Render the bloghome.html template
+        return "blogcentral";
     }
+ 
 
 
 
