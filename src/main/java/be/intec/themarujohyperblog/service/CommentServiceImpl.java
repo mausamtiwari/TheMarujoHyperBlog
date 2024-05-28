@@ -14,24 +14,25 @@ import java.util.Optional;
 @Service
 public class CommentServiceImpl implements CommentService {
 
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
     public CommentServiceImpl(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;
     }
-
+    @Override
+    public List<BlogComment> getAllComment() {
+        return commentRepository.findAll();
+    }
     @Override
     public void saveComment(BlogComment comment) {
         this.commentRepository.save(comment);
     }
-
     @Override
     public BlogComment getCommentById(Long id) {
         Optional<BlogComment> comment = commentRepository.findById(id);
         return comment.orElseThrow(() -> new RuntimeException("Comment not found for id :: " + id));
     }
-
     @Override
     public void deleteCommentById(Long id) {
         boolean exists = commentRepository.existsById(id);
@@ -41,6 +42,7 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteById(id);
     }
 
+
     @Override
     public Page<BlogComment> findCommentPaginated(Long postId, int pageNo, int pageSize) {
         // Creates a Pageable object with the given page number (pageNo) and page size (pageSize)
@@ -48,11 +50,6 @@ public class CommentServiceImpl implements CommentService {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
         // Uses the commentRepository to find comments by the postId with pagination
         // The method findByPostId takes the postId and pageable as arguments and returns a Page<Comment> containing the comments for that page.
-        return commentRepository.findByBlogPostId(postId, pageable);
-    }
-
-    @Override
-    public List<BlogComment> getAllComment() {
-        return commentRepository.findAll();
+        return commentRepository.findByPostId(postId, pageable);
     }
 }
