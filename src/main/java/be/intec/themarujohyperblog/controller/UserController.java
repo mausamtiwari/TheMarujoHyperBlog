@@ -1,19 +1,22 @@
 package be.intec.themarujohyperblog.controller;
 
-import org.springframework.stereotype.Controller;
+//import be.intec.themarujohyperblog.config.PasswordMatchesValidator;
 
 import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.service.UserService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +30,10 @@ public class UserController {
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    ConstraintValidatorContext context;
+    ;
+
+    // private final PasswordMatchesValidator passwordMatchesValidator = new PasswordMatchesValidator();
 
     private final UserService userService;
 
@@ -42,33 +49,95 @@ public class UserController {
         return "register";
     }
 
-    @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("user") User user, Model model) {
+    // Password confirmation validation error
+   /* @PostMapping("/register")
+    public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, Model model, BindingResult result) {
         // System.out.println("Registering user: " + user);
         logger.info("Registering user: {}", user);
-        Optional<User> existingUser = userService.findByUserName(user.getUsername());
-        if (existingUser.isPresent()) {
-            model.addAttribute("error", "Username already exists");
-            return "register";
+
+        // Check for validation errors
+        if (result.hasErrors()) {
+            result.getAllErrors().forEach(error -> logger.warn("Validation error: {}", error));
+            model.addAttribute("error", "Validation failed");
+            return "redirect:/register";
         }
 
+        Optional<User> existingUserName = userService.findByUserName(user.getUsername());
+        if (existingUserName.isPresent()) {
+            logger.warn("User already exists: {}", username);
+            model.addAttribute("error", "Username already exists");
+            return "redirect:/register";
+        }
+
+        Optional<User> existingEmail = userService.findUserByEmail(user.getEmail());
+        if (existingEmail.isPresent()) {
+            logger.warn("User already exists with email: {}", existingEmail);
+            model.addAttribute("error", "Email already exists");
+            return "redirect:/register";
+        }
+
+        // Check for password match
+        if (!passwordMatchesValidator.isValid(user,null)) {
+            model.addAttribute("error", "Passwords do not match");
+            return "redirect:/register";
+        }
+
+        // Register user if all checks pass
         userService.registerUser(user);
         logger.info("User registered with username: {}", user.getUsername());
-        // System.out.println("User registered with username: " + user.getUsername());
         return "redirect:/login";
     }
 
-    /*@PostMapping("/login")
-    public String login(@ModelAttribute User user) {
-        Optional<User> userAuth = userService.findByUserNameAndPassword(user.getUsername(), user.getPassword());
-        System.out.println(userAuth);
-        if (Objects.nonNull(userAuth)) {
-            return "redirect:/";
-        } else {
-            return "redirect:/login";
+
+    @GetMapping("/login")
+    public String showLoginForm(@RequestParam(value = "error", required = false) String error, Model model) {
+        model.addAttribute("user", new User());
+        if (error != null) {
+            model.addAttribute("error", "Invalid username or password");
+        }
+        return "login";
+    }*/
+
+    @PostMapping("/register")
+    public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, Model model, BindingResult result) {
+        // System.out.println("Registering user: " + user);
+        logger.info("Registering user: {}", user);
+
+        // Check for validation errors
+        if (result.hasErrors()) {
+            result.getAllErrors().forEach(error -> logger.warn("Validation error: {}", error));
+            model.addAttribute("error", "Validation failed");
+            return "redirect:/register";
         }
 
-    }*/
+        Optional<User> existingUserName = userService.findByUserName(user.getUsername());
+        if (existingUserName.isPresent()) {
+            logger.warn("User already exists: {}", username);
+            model.addAttribute("error", "Username already exists");
+            return "/register";
+        }
+
+        Optional<User> existingEmail = userService.findUserByEmail(user.getEmail());
+        if (existingEmail.isPresent()) {
+            logger.warn("User already exists with email: {}", existingEmail);
+            model.addAttribute("error", "Email already exists");
+            return "/register";
+        }
+
+        // Check for password match
+        boolean isValid = user.getPassword().equals(user.getConfirmPassword());
+        if (!isValid) {
+            logger.warn("Passwords do not match");
+            model.addAttribute("error", "Passwords do not match");
+            return "/register";
+        }
+
+        // Register user if all checks pass
+        userService.registerUser(user);
+        logger.info("User registered with username: {}", user.getUsername());
+        return "/login";
+    }
+
 
     @GetMapping("/login")
     public String showLoginForm(@RequestParam(value = "error", required = false) String error, Model model) {
@@ -146,7 +215,6 @@ public class UserController {
         }
 
         User updatedUser = existingUser.get();
-        //updatedUser.setUsername(user.getUsername());
         updatedUser.setFirstName(user.getFirstName());
         updatedUser.setLastName(user.getLastName());
         updatedUser.setEmail(user.getEmail());
@@ -224,5 +292,4 @@ public class UserController {
     }
 
 }
-
 

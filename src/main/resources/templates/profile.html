@@ -3,32 +3,67 @@
 <head>
     <title>Profile</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Optional custom CSS for sidebar styling */
+        .sidebar {
+            background-color: #f8f9fa;
+            padding: 15px;
+            height: 100vh;
+            position: fixed;
+        }
+        .sidebar a {
+            color: #333;
+            text-decoration: none;
+            display: block;
+            margin: 10px 0;
+        }
+        .sidebar a:hover {
+            text-decoration: underline;
+        }
+        .main-content {
+            margin-left: 200px; /* Adjust based on sidebar width */
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h2>User Profile</h2>
-    <div>
-        <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
-        <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
-        <div th:if="${user.profilePicture != null}">
-            <img th:src="@{'/uploads/' + ${user.profilePicture}}" alt="Profile Picture" class="img-thumbnail" />
-            <form th:action="@{/delete-picture/{id}(id=${user.id})}" method="post">
-                <button type="submit" class="btn btn-danger">Delete Picture</button>
-            </form>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 sidebar">
+            <h4>Navigation</h4>
+            <a href="/">Home</a>
+            <a href="/blogcentral.html">BlogCentral</a>
+            <!-- Add more links as needed -->
         </div>
-        <div th:if="${user.profilePicture == null}">
-            <form th:action="@{/upload/{id}(id=${user.id})}" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="file">Upload Profile Picture:</label>
-                    <input type="file" class="form-control" id="file" name="file" />
+
+        <!-- Main content -->
+        <div class="col-md-9 main-content">
+            <h2>User Profile</h2>
+            <div>
+                <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
+                <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                <div th:if="${user.profilePicture != null}">
+                    <img th:src="@{'/uploads/' + ${user.profilePicture}}" alt="Profile Picture" class="img-thumbnail" />
+                    <form th:action="@{/delete-picture/{id}(id=${user.id})}" method="post">
+                        <button type="submit" class="btn btn-danger">Delete Picture</button>
+                    </form>
                 </div>
-                <button type="submit" class="btn btn-primary">Upload</button>
-            </form>
+                <div th:if="${user.profilePicture == null}">
+                    <form th:action="@{/upload/{id}(id=${user.id})}" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="file">Upload Profile Picture:</label>
+                            <input type="file" class="form-control" id="file" name="file" />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </form>
+                </div>
+                <a th:href="@{/edit/{id}(id=${user.id})}" class="btn btn-secondary">Edit Profile</a>
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">
+                    Delete Profile
+                </button>
+            </div>
         </div>
-        <a th:href="@{/edit/{id}(id=${user.id})}" class="btn btn-secondary">Edit Profile</a>
-        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">
-            Delete Profile
-        </button>
     </div>
 </div>
 

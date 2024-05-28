@@ -1,0 +1,60 @@
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #ffffff;
+    color: #333333;
+}
+
+header {
+    border-bottom: 1px solid #e1e1e1;
+    padding-bottom: 10px;
+}
+
+header .form-inline input[type="search"] {
+    border-radius: 25px;
+    width: 200px;
+}
+
+header .btn {
+    border-radius: 25px;
+}
+
+.article-title {
+    font-family: 'Georgia', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.author-info .author-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.author-name {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.article-content {
+    font-family: 'Georgia', serif;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e1e1e1;
+}
+
+.article-content h2 {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 20px;
+}
+
+.article-content p {
+    font-family: 'Georgia', serif;
+    font-size: 1.125rem;
+    line-height: 1.6;
+}

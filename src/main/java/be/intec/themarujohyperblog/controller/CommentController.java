@@ -2,8 +2,7 @@ package be.intec.themarujohyperblog.controller;
 
 import be.intec.themarujohyperblog.model.BlogComment;
 import be.intec.themarujohyperblog.model.BlogPost;
-import be.intec.themarujohyperblog.service.CommentServiceImpl;
-import be.intec.themarujohyperblog.service.PostServiceImpl;
+import be.intec.themarujohyperblog.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -16,13 +15,16 @@ import java.util.List;
 public class CommentController {
 
     private final CommentServiceImpl commentService;
+
     private final PostServiceImpl postService;
 
+    private final UserServiceImpl userService;
 
     @Autowired
-    public CommentController(CommentServiceImpl commentService, PostServiceImpl postService) {
+    public CommentController(CommentServiceImpl commentService, PostServiceImpl postService, UserServiceImpl userService) {
         this.commentService = commentService;
         this.postService = postService;
+        this.userService = userService;
     }
 
     //Handles GET request for displaying all comments for a specific post
@@ -40,7 +42,7 @@ public class CommentController {
         model.addAttribute("commentList", commentList);
 
         // Fetches the post to which comments belong and adds to the model
-        BlogPost post = postService.getPost(postId);
+        BlogPost post = postService.getPostById(postId);
         model.addAttribute("blog_post", post);
         model.addAttribute("comment", new BlogComment());
         return "blog_comment";
@@ -50,7 +52,7 @@ public class CommentController {
     @PostMapping("/blog_post/{blogpostId}/blog_comment")
     public String createComment(@PathVariable(value = "blogpostId") Long postId,
                                 @ModelAttribute("comment") BlogComment comment) {
-        BlogPost post = postService.getPost(postId);
+        BlogPost post = postService.getPostById(postId);
         // Associates the comment with the post
         comment.setPost(post);
         commentService.saveComment(comment);

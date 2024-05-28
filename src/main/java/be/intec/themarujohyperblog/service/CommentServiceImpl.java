@@ -2,7 +2,6 @@ package be.intec.themarujohyperblog.service;
 
 import be.intec.themarujohyperblog.model.BlogComment;
 import be.intec.themarujohyperblog.repository.CommentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +15,6 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
-    @Autowired
     public CommentServiceImpl(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;
     }

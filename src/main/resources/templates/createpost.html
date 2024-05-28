@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${post.title}">Post Title</h1>
+    <p th:text="${post.content}">Post Content</p>
+    <a class="btn btn-secondary" th:href="@{'/posts/update/' + ${post.id}}">Update Post</a>
+    <a class="btn btn-secondary" th:href="@{'/posts/delete/' + ${post.id}}">Delete Post</a>
+    <a class="btn btn-secondary" href="/posts">Back to All Posts</a>
+</div>
+</body>
+</html>
