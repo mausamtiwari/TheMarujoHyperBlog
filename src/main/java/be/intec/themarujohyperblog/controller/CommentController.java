@@ -52,7 +52,7 @@ public class CommentController {
                                 @ModelAttribute("comment") BlogComment comment) {
         BlogPost post = postService.getPost(postId);
         // Associates the comment with the post
-        comment.setBlogPost(post);
+        comment.setPost(post);
         commentService.saveComment(comment);
         return "redirect:/blog_post/" + postId + "/blog_comment";
     }

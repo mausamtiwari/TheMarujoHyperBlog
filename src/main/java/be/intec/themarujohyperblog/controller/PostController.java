@@ -26,6 +26,7 @@ public class PostController {
     @GetMapping("/")  //root, eerste pagina
     public String viewHomePage(Model model) {
         return findPostPaginated(1,model); //dit beperkt ons tot 1 pagina?
+
     }
 
     @GetMapping("/showNewPostForm") // dit toont de pagina om een
