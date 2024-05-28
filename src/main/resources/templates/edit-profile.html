@@ -9,8 +9,12 @@
     <h2>Edit Profile</h2>
     <form th:action="@{/edit/{id}(id=${user.id})}" th:object="${user}" method="post">
         <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" class="form-control" id="username" th:field="*{username}" />
+            <label for="firstName">First Name:</label>
+            <input type="text" class="form-control" id="firstName" th:field="*{firstName}" />
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name:</label>
+            <input type="text" class="form-control" id="lastName" th:field="*{lastName}" />
         </div>
         <div class="form-group">
             <label for="email">Email:</label>
@@ -19,6 +23,10 @@
         <div class="form-group">
             <label for="password">Password:</label>
             <input type="password" class="form-control" id="password" th:field="*{password}" />
+        </div>
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" />
         </div>
         <button type="submit" class="btn btn-primary">Save Changes</button>
     </form>

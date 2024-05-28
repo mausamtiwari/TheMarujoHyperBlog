@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -26,13 +28,20 @@ public class SecurityConfig {
                 .formLogin(formLogin ->
                         formLogin
                                 .loginPage("/login")
+                                .defaultSuccessUrl("/afterlogin", true)
                                 .permitAll()
                 )
-                .logout(LogoutConfigurer::permitAll
-                )*/
+                .logout(logout ->
+                logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/login?logout=true")
+                    .permitAll()
+            )*/
                 .oauth2Login(oauth2Login ->
                         oauth2Login
                                 .loginPage("/login")
+                                .successHandler(oauth2SuccessHandler())
+                                .failureHandler(oauth2FailureHandler())
                 );
 
         return http.build();
@@ -41,6 +50,20 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler oauth2SuccessHandler() {
+        return (request, response, authentication) -> {
+            response.sendRedirect("/afterlogin");
+        };
+    }
+
+    @Bean
+    public AuthenticationFailureHandler oauth2FailureHandler() {
+        return (request, response, exception) -> {
+            response.sendRedirect("/login?error=true");
+        };
     }
 
 }

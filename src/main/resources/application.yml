@@ -1,29 +1,3 @@
-#spring.application.name=TheMarujoHyperBlog
-#spring.datasource.url=jdbc:mysql://localhost:3306/blogdb
-#spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-#spring.datasource.username=marujo
-#spring.datasource.password=marujo
-
-# Hibernate
-#spring.jpa.properties.hibernate.format_sql=true
-#spring.jpa.show-sql=true
-
-# The SQL dialect makes Hibernate generate better SQL for the chosen database
-#spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5InnoDBDialect
-#spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL8Dialect
-
-# Hibernate ddl auto (create, create-drop, validate, update)
-#spring.jpa.hibernate.ddl-auto = update
-#logging.level.org.hibernate.SQL=DEBUG
-#logging.level.org.hibernate.type=TRACE
-
-#spring.security.oauth2.client.registration.google.client-id=514051386784-i4n1leb6rjk8h5hbovtnfquhlb4o0as1.apps.googleusercontent.com
-#spring.security.oauth2.client.registration.google.client-secret=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
-
-
-#spring.security.oauth2.client.registration.github.client-id=Iv23li3nWCIgsN6jc4Y4
-#spring.security.oauth2.client.registration.github.client-secret=34cda707ce8f034449684c050c8e56263277f240
-
 spring:
   application:
     name: TheMarujoHyperBlog
@@ -45,13 +19,22 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
-
+            client-id: 514051386784-i4n1leb6rjk8h5hbovtnfquhlb4o0as1.apps.googleusercontent.com
+            client-secret: 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
+            scope: profile, email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
           github:
-            client-id: ${GOOGLE_CLIENT_SECRET}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
-
+            client-id: Iv23li3nWCIgsN6jc4Y4
+            client-secret: 34cda707ce8f034449684c050c8e56263277f240
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -59,10 +42,8 @@ spring:
 
 logging:
   level:
-    org:
-    hibernate:
-      SQL: DEBUG
-      type: TRACE
+    org.springframework: INFO
+    be.intec.themarujohyperblog: DEBUG
 
 
 

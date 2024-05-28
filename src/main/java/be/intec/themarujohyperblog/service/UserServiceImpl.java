@@ -26,12 +26,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
-   @Override
+ /*  @Override
     public void registerUser(User user) {
         userRepository.save(user);
-    }
+    }*/
 
-   /* @Override
+    @Override
     public void registerUser(User user) {
         if (user.getId() != null) {
             // Editing an existing employee
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
             }
             userRepository.save(user);
         }
-    }*/
+    }
 
     @Override
     public void deleteUser(Long userId) {
