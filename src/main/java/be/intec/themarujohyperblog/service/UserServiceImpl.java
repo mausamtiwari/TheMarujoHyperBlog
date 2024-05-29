@@ -3,6 +3,8 @@ package be.intec.themarujohyperblog.service;
 import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,21 +39,21 @@ public class UserServiceImpl implements UserService {
             if (existingUserOptional.isPresent()) {
                 User existingUser = existingUserOptional.get();
                 if (!existingUser.getEmail().equals(user.getEmail())) {
-                    // Check if the new email is taken by another employee
-                    Optional<User> emailCheckEmployee = userRepository.findByEmail(user.getEmail());
-                    if (emailCheckEmployee.isPresent()) {
+                    // Check if the new email is taken by another user
+                    Optional<User> emailCheckUser = userRepository.findByEmail(user.getEmail());
+                    if (emailCheckUser.isPresent()) {
                         throw new IllegalStateException("email taken");
                     }
                 }
                 // Save the updated employee details
                 userRepository.save(user);
             } else {
-                throw new IllegalStateException("employee not found");
+                throw new IllegalStateException("user not found");
             }
         } else {
             // Creating a new employee
-            Optional<User> optionalEmployee = userRepository.findByEmail(user.getEmail());
-            if (optionalEmployee.isPresent()) {
+            Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
+            if (optionalUser.isPresent()) {
                 throw new IllegalStateException("email taken");
             }
             userRepository.save(user);
@@ -91,9 +93,6 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findByUserNameAndPassword(String username, String password) {
         return userRepository.findByUsernameAndPassword(username, password);
     }
-
-
-
 
    /* @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
