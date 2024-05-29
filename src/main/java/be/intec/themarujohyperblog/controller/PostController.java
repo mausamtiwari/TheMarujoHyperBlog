@@ -167,7 +167,7 @@ public class PostController {
         post.setUser(user);
         postService.savePost(post);
         model.addAttribute("posts", userPosts);
-        return "afterlogin";
+        return "userposts";
     }
 
    /* @GetMapping("/afterlogin")
