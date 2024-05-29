@@ -11,7 +11,7 @@
             position: fixed;
             top: 0;
             right: 0;
-            width: 200px;
+            width: 150px;
             color: #fff;
             font-family: Arial, sans-serif;
         }
@@ -75,13 +75,9 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="/login">Log in</a></li>
                 <li class="nav-item"><a class="nav-link" href="/register">Sign up</a></li>
-                <li class="nav-item"><a class="nav-link" href="/search">Search in blog descriptions</a></li>
-                <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li>
-                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Blog</a></li>
+                <li class="nav-item"><a class="nav-link" href="/search">Search</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logout">Log out</a></li>
                 <li class="nav-item dropdown">
-                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/logout">Log out</a></li>
                     </ul>
                 </li>
             </ul>
@@ -191,25 +187,68 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    // Sample user data (replace with actual user data)
-    var userData = {
-        avatarUrl: "/path/to/avatar.jpg", // Replace with the URL of the user's avatar image
-        name: "Rutgero" // Replace with the user's name
-    };
+    // Function to fetch user data from the server
+    function fetchUserData() {
+        // Make an AJAX request to fetch user data
+        // Example using jQuery's $.ajax() method
+        $.ajax({
+            url: '/api/getUserData', // Replace with your endpoint to fetch user data
+            method: 'GET',
+            success: function(response) {
+                // Update user data in the sidebar
+                document.getElementById('user-avatar').src = response.avatarUrl;
+                document.getElementById('user-name').textContent = response.name;
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching user data:', error);
+            }
+        });
+    }
 
-    // Sample data for online users and total visitors
-    var onlineUsersCount = 10; // Replace with the actual count of online users
-    var totalVisitorsCount = 1000; // Replace with the actual count of total visitors
+    // Function to fetch online users count from the server
+    function fetchOnlineUsersCount() {
+        // Make an AJAX request to fetch online users count
+        // Example using jQuery's $.ajax() method
+        $.ajax({
+            url: '/api/getOnlineUsersCount', // Replace with your endpoint to fetch online users count
+            method: 'GET',
+            success: function(response) {
+                // Update online users count
+                document.getElementById('online-users-count').textContent = response.onlineUsersCount;
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching online users count:', error);
+            }
+        });
+    }
 
-    // Populate user avatar and name in the sidebar
-    document.getElementById('user-avatar').src = userData.avatarUrl;
-    document.getElementById('user-name').textContent = userData.name;
+    // Function to fetch total visitors count from the server
+    function fetchTotalVisitorsCount() {
+        // Make an AJAX request to fetch total visitors count
+        // Example using jQuery's $.ajax() method
+        $.ajax({
+            url: '/api/getTotalVisitorsCount', // Replace with your endpoint to fetch total visitors count
+            method: 'GET',
+            success: function(response) {
+                // Update total visitors count (rounded up)
+                document.getElementById('total-visitors-count').textContent = Math.ceil(response.totalVisitorsCount);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching total visitors count:', error);
+            }
+        });
+    }
 
-    // Update online users count
-    document.getElementById('online-users-count').textContent = onlineUsersCount;
+    // Call the functions initially to fetch and update the data
+    fetchUserData();
+    fetchOnlineUsersCount();
+    fetchTotalVisitorsCount();
 
-    // Update total visitors count (rounded up)
-    document.getElementById('total-visitors-count').textContent = Math.ceil(totalVisitorsCount);
+    // Set intervals to periodically update the data
+    setInterval(fetchUserData, 60000); // Update user data every minute
+    setInterval(fetchOnlineUsersCount, 60000); // Update online users count every minute
+    setInterval(fetchTotalVisitorsCount, 60000); // Update total visitors count every minute
+
 
 </script>
 </body>
