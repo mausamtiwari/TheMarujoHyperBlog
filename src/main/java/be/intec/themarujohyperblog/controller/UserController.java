@@ -2,18 +2,28 @@ package be.intec.themarujohyperblog.controller;
 
 //import be.intec.themarujohyperblog.config.PasswordMatchesValidator;
 
+import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.model.User;
+import be.intec.themarujohyperblog.service.PostServiceImpl;
 import be.intec.themarujohyperblog.service.UserService;
+import be.intec.themarujohyperblog.service.UserServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +32,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -35,12 +47,14 @@ public class UserController {
 
     // private final PasswordMatchesValidator passwordMatchesValidator = new PasswordMatchesValidator();
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
+    private final PostServiceImpl postService;
 
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserServiceImpl userService, PostServiceImpl postService) {
         this.userService = userService;
+        this.postService = postService;
     }
 
     @GetMapping("/register")
@@ -49,7 +63,8 @@ public class UserController {
         return "register";
     }
 
-    // Password confirmation validation error
+    // TODO PasswordMatchesValidator bug fix
+    // Password confirmation validation error .
    /* @PostMapping("/register")
     public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, Model model, BindingResult result) {
         // System.out.println("Registering user: " + user);
@@ -99,29 +114,36 @@ public class UserController {
     }*/
 
     @PostMapping("/register")
-    public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, Model model, BindingResult result) {
-        // System.out.println("Registering user: " + user);
+    public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
         logger.info("Registering user: {}", user);
 
         // Check for validation errors
         if (result.hasErrors()) {
-            result.getAllErrors().forEach(error -> logger.warn("Validation error: {}", error));
-            model.addAttribute("error", "Validation failed");
-            return "redirect:/register";
+            for (FieldError error : result.getFieldErrors()) {
+                model.addAttribute("error", error.getDefaultMessage());
+                logger.warn("Validation error: field: {}, message: {}", error.getField(), error.getDefaultMessage());
+                // Check if the error is related to the password field
+                if ("password".equals(error.getField())) {
+                    logger.warn("Password validation error: {}", error.getDefaultMessage());
+                    model.addAttribute("passwordError", error.getDefaultMessage());
+                }
+            }
+            model.addAttribute("user", user);
+            return "register";
         }
 
         Optional<User> existingUserName = userService.findByUserName(user.getUsername());
         if (existingUserName.isPresent()) {
             logger.warn("User already exists: {}", username);
             model.addAttribute("error", "Username already exists");
-            return "/register";
+            return "register";
         }
 
         Optional<User> existingEmail = userService.findUserByEmail(user.getEmail());
         if (existingEmail.isPresent()) {
             logger.warn("User already exists with email: {}", existingEmail);
             model.addAttribute("error", "Email already exists");
-            return "/register";
+            return "register";
         }
 
         // Check for password match
@@ -129,15 +151,14 @@ public class UserController {
         if (!isValid) {
             logger.warn("Passwords do not match");
             model.addAttribute("error", "Passwords do not match");
-            return "/register";
+            return "register";
         }
 
         // Register user if all checks pass
         userService.registerUser(user);
         logger.info("User registered with username: {}", user.getUsername());
-        return "/login";
+        return "redirect:/login";
     }
-
 
     @GetMapping("/login")
     public String showLoginForm(@RequestParam(value = "error", required = false) String error, Model model) {
@@ -153,7 +174,14 @@ public class UserController {
         logger.info("Attempting to login with username: {}", username);
         //System.out.println("Attempting to login with username: " + username);
         Optional<User> userOptional = userService.findByUserName(username);
-        if (userOptional.isEmpty() || (!password.equals(userOptional.get().getPassword()))) {
+        if (userOptional.isEmpty()) {
+            logger.warn("User not found in database: {}", username);
+            // System.out.println("Invalid login credentials.");
+            model.addAttribute("error", "User not found in database");
+            model.addAttribute("user", new User());
+            return "login";
+        }
+        if (!password.equals(userOptional.get().getPassword())) {
             logger.warn("Invalid login credentials for username: {}", username);
             // System.out.println("Invalid login credentials.");
             model.addAttribute("error", "Invalid username or password");
@@ -164,8 +192,17 @@ public class UserController {
         logger.info("{} logged in successfully", username);
         session.setAttribute("username", username); // Store username in the session
         // System.out.println(username + " logged in successfully");
+        session.setAttribute("loggedInUser", user);
         model.addAttribute("user", user);
+        List<BlogPost> posts = postService.getAllPosts();
+        model.addAttribute("posts", posts);
+
         return "afterlogin";
+    }
+
+    @GetMapping("/user")
+    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
+        return principal.getAttributes();
     }
 
 
@@ -178,6 +215,19 @@ public class UserController {
         }
         model.addAttribute("user", user);
         return "redirect:/blogcentral";
+    }*/
+
+  /*  @GetMapping("/myPosts")
+    public String showMyPosts(Model model, @RequestParam(value = "page", defaultValue = "1") int page, @AuthenticationPrincipal User user) {
+        int pageSize = 5; // Number of posts per page
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+
+        Page<BlogPost> userPosts = postService.getPostsByUser(user, pageable);
+        model.addAttribute("userPosts", userPosts);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", userPosts.getTotalPages());
+
+        return "userposts";
     }*/
 
     @GetMapping("/profile/{id}")
@@ -205,25 +255,73 @@ public class UserController {
 
     @PostMapping("/edit/{id}")
     public String editUserProfile(@PathVariable("id") Long id, @Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
+        logger.info("Attempting to update user profile: {}", user);
+
+        // Check for validation errors
         if (result.hasErrors()) {
+            for (FieldError error : result.getFieldErrors()) {
+                logger.warn("Validation error: field: {}, message: {}", error.getField(), error.getDefaultMessage());
+                model.addAttribute("error", error.getDefaultMessage());
+                if ("password".equals(error.getField())) {
+                    logger.warn("Password validation error: {}", error.getDefaultMessage());
+                    model.addAttribute("passwordError", error.getDefaultMessage());
+                }
+            }
+            model.addAttribute("user", user);
             return "edit-profile";
         }
+
+        // Retrieve the existing user from the database
         Optional<User> existingUser = userService.findUserById(id);
         if (existingUser.isEmpty()) {
+            logger.error("User with id {} not found", id);
             model.addAttribute("error", "User not found.");
             return "error";
         }
 
         User updatedUser = existingUser.get();
+
+        // Check if email is taken by another user
+        if (!updatedUser.getEmail().equals(user.getEmail())) {
+            Optional<User> existingEmail = userService.findUserByEmail(user.getEmail());
+            if (existingEmail.isPresent()) {
+                logger.warn("Email already exists: {}", user.getEmail());
+                model.addAttribute("error", "Email already exists");
+                model.addAttribute("user", user);
+                return "edit-profile";
+            }
+        }
+
+        // Check for password match
+        if (!user.getPassword().equals(user.getConfirmPassword())) {
+            logger.warn("Passwords do not match");
+            model.addAttribute("error", "Passwords do not match");
+            model.addAttribute("user", user);
+            return "edit-profile";
+        }
+
+        // Ensure mandatory fields are not left empty
+        if (user.getFirstName().isEmpty() || user.getLastName().isEmpty() || user.getEmail().isEmpty() || user.getPassword().isEmpty() || user.getConfirmPassword().isEmpty()) {
+            logger.warn("One or more fields are empty");
+            model.addAttribute("error", "All fields are required.");
+            model.addAttribute("user", user);
+            return "edit-profile";
+        }
+
+        logger.info("Updating user profile for: {}", user);
         updatedUser.setFirstName(user.getFirstName());
         updatedUser.setLastName(user.getLastName());
         updatedUser.setEmail(user.getEmail());
         updatedUser.setPassword(user.getPassword());
         updatedUser.setConfirmPassword(user.getConfirmPassword());
+        logger.info("User profile updated: {}", user);
 
         userService.updateUser(updatedUser);
         return "redirect:/profile/" + id;
     }
+
+
+
 
     @PostMapping("/user/delete/{id}")
     public String deleteUserProfile(@PathVariable("id") Long id, Model model) {
@@ -290,5 +388,6 @@ public class UserController {
         session.invalidate();
         return "redirect:/login?logout";
     }
+
 
 }
