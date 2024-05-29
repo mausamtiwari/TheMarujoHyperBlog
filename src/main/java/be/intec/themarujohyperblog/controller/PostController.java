@@ -1,7 +1,10 @@
 package be.intec.themarujohyperblog.controller;
 
 import be.intec.themarujohyperblog.model.BlogPost;
+import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.service.PostServiceImpl;
+import be.intec.themarujohyperblog.service.UserServiceImpl;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,21 +14,27 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.data.domain.Page;
 
+import java.util.Date;
 import java.util.List;
 
 @Controller
 public class PostController {
 
+    private final UserServiceImpl userServiceImpl;
+    private final HttpSession httpSession;
     private PostServiceImpl postService;
 
     @Autowired //Controller
-    public  PostController(PostServiceImpl postService) {
+    public  PostController(PostServiceImpl postService, UserServiceImpl userServiceImpl, HttpSession httpSession) {
         this.postService = postService;
+        this.userServiceImpl = userServiceImpl;
+        this.httpSession = httpSession;
     }
 
     @GetMapping("/")  //root, eerste pagina
     public String viewHomePage(Model model) {
         return findPostPaginated(1,model); //dit beperkt ons tot 1 pagina?
+
 
     }
 
@@ -37,9 +46,29 @@ public class PostController {
         return "new_post";
     }
 
+
+
+
     @PostMapping("/createPost") // dit maakt een nieuwe post aan
     public String createPost(@ModelAttribute("post") BlogPost post) {
+        if (post.getDescription() == null || post.getDescription().trim().isEmpty()) {
+            post.setDescription("No description available");
+        }
+        post.setCreatedAt(new Date());
+        post.setUpdatedAt(new Date());
+        User user = (User) httpSession.getAttribute("user"); //hier krijg je de user!
+
+        //Check of de user in de sessie ingelogd is, anders nieuwe login::
+        if (user == null) {
+            // Handle the case where the user is null. For example, you can redirect to the login page.
+            return "redirect:/login";
+        }
+
+        post.setUser(user);
+
+
         postService.savePost(post);
+
         return "redirect:/";
     }
 
@@ -56,6 +85,7 @@ public class PostController {
         BlogPost existingPost = postService.getPost(postId);
         existingPost.setTitle(post.getTitle());
         existingPost.setContent(post.getContent());
+        existingPost.setUpdatedAt(new Date());
         postService.savePost(existingPost);
         return "redirect:/";
     }
@@ -82,6 +112,20 @@ public class PostController {
 
         return "blogcentral";
     }
+
+    @PostMapping("/search") //search for posts where the description contains a particular word
+    public String searchPost(@ModelAttribute("search") String search, Model model) {
+        Page<BlogPost> postList = postService.searchPostDescription(search);
+        model.addAttribute("postList", postList);
+        return "redirect:/searchResults";
+    }
+
+    @GetMapping("/searchResults") //show the search form
+    public String showSearchForm(Model model) {
+        return "search"; //dit is de pagina waar de zoekresultaten getoond worden
+    }
+
+
  
 
 

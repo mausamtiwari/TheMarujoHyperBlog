@@ -92,6 +92,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsernameAndPassword(username, password);
     }
 
+
+
+
    /* @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> userOptional = userRepository.findByUsername(username);

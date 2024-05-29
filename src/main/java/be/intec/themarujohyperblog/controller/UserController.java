@@ -135,7 +135,7 @@ public class UserController {
         // Register user if all checks pass
         userService.registerUser(user);
         logger.info("User registered with username: {}", user.getUsername());
-        return "/login";
+        return "redirect:/createPost"; //toegevoegd door Jonathan
     }
 
 
@@ -165,7 +165,7 @@ public class UserController {
         session.setAttribute("username", username); // Store username in the session
         // System.out.println(username + " logged in successfully");
         model.addAttribute("user", user);
-        return "afterlogin";
+        return "redirect:/showNewPostForm"; // Redirecting to the blog central page
     }
 
 
