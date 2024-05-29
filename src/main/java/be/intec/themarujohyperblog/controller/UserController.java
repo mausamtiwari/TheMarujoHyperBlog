@@ -2,14 +2,20 @@ package be.intec.themarujohyperblog.controller;
 
 //import be.intec.themarujohyperblog.config.PasswordMatchesValidator;
 
+import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.model.User;
+import be.intec.themarujohyperblog.service.PostServiceImpl;
 import be.intec.themarujohyperblog.service.UserService;
+import be.intec.themarujohyperblog.service.UserServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,12 +46,14 @@ public class UserController {
 
     // private final PasswordMatchesValidator passwordMatchesValidator = new PasswordMatchesValidator();
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
+    private final PostServiceImpl postService;
 
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserServiceImpl userService, PostServiceImpl postService) {
         this.userService = userService;
+        this.postService = postService;
     }
 
     @GetMapping("/register")
@@ -182,6 +190,7 @@ public class UserController {
         logger.info("{} logged in successfully", username);
         session.setAttribute("username", username); // Store username in the session
         // System.out.println(username + " logged in successfully");
+        session.setAttribute("loggedInUser", user);
         model.addAttribute("user", user);
         return "afterlogin";
     }
@@ -201,6 +210,19 @@ public class UserController {
         }
         model.addAttribute("user", user);
         return "redirect:/blogcentral";
+    }*/
+
+  /*  @GetMapping("/myPosts")
+    public String showMyPosts(Model model, @RequestParam(value = "page", defaultValue = "1") int page, @AuthenticationPrincipal User user) {
+        int pageSize = 5; // Number of posts per page
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+
+        Page<BlogPost> userPosts = postService.getPostsByUser(user, pageable);
+        model.addAttribute("userPosts", userPosts);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", userPosts.getTotalPages());
+
+        return "userposts";
     }*/
 
     @GetMapping("/profile/{id}")
@@ -317,4 +339,3 @@ public class UserController {
 
 
 }
-

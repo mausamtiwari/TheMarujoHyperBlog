@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="">
 <head>
     <meta charset="UTF-8">
-    <title>Getting Started with Spring Boot: A Beginner’s Guide</title>
+    <title>Marujo Blog</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
@@ -17,21 +17,21 @@
         }
 
         header .form-inline .input-group {
-            width: 500px; /* Adjusted width for better appearance */
+            width: 500px;
         }
 
         header .form-inline input[type="search"] {
-            border-radius: 25px 0 0 25px; /* Rounded corners for the input */
-            border-right: none; /* Remove the right border to blend with the button */
+            border-radius: 25px 0 0 25px;
+            border-right: none;
         }
 
         header .form-inline .btn {
-            border-radius: 0 25px 25px 0; /* Rounded corners for the button */
+            border-radius: 0 25px 25px 0;
         }
 
         header .form-inline input[type="search"]:focus {
-            border-color: #28a745; /* Green border color when focused */
-            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25); /* Green shadow */
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
         }
 
         header .btn {
@@ -71,7 +71,9 @@
             line-height: 1.6;
         }
 
-
+        .pagination {
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -93,34 +95,49 @@
         <div>
             <a th:href="@{/login}" class="btn btn-outline-success mr-2">Sign in</a>
             <a th:href="@{/register}" class="btn btn-outline-success">Sign Up</a>
-
         </div>
     </header>
 
-    <article>
-        <h1 class="article-title">Getting Started with Spring Boot: A Beginner’s Guide</h1>
-        <div class="d-flex align-items-center author-info mb-3">
-            <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" class="author-photo mr-2" alt="Author Photo">
-            <div>
-                <span class="author-name">Mutahir Manzoor</span> &middot; <span class="text-muted">4 min read</span>
-                &middot; <span class="text-muted">Sep 3, 2023</span>
-            </div>
+    <div class="container mt-4">
+        <div th:each="post : ${postList}">
+            <article>
+                <h1 class="article-title" th:text="${post.title}">Post Title</h1>
+                <div class="d-flex align-items-center author-info mb-3">
+                    <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" class="author-photo mr-2" alt="Author Photo">
+                    <div>
+                        <span class="author-name" th:text="${post.user.username}">Author Name</span> &middot;
+                        <span class="text-muted">4 min read</span> &middot;
+                        <span class="text-muted" th:text="${#dates.format(post.createdAt, 'MMM d, yyyy')}">Date</span>
+                    </div>
+                </div>
+                <div class="article-content">
+                    <p th:text="${post.content}">Post Content</p>
+                </div>
+            </article>
         </div>
-        <div class="article-content">
-            <p>Spring Boot is a powerful and popular framework for building Java applications. It facilitates the
-                development process by providing a set of standards and defaults, which allows developers to quickly
-                create production-ready applications. Whether you’re an experienced Java programmer or just getting
-                started with programming, Spring Boot can simplify your life. In this article, we’ll walk you through
-                the basics of getting started with Spring Boot.</p>
-            <h2>What is Spring Boot?</h2>
-            <p>Spring Boot is an extension of the Spring Framework, which is widely used in Java application
-                development. While the Spring Framework provides a comprehensive programming and configuration model for
-                modern Java-based enterprise applications, Spring Boot makes it easier to create stand-alone,
-                production-grade Spring-based applications.</p>
-        </div>
-    </article>
+    </div>
+
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{'/page/' + ${currentPage - 1}}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item" th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+                th:classappend="${pageNum == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{'/page/' + ${pageNum}}" th:text="${pageNum}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{'/page/' + ${currentPage + 1}}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
-
-

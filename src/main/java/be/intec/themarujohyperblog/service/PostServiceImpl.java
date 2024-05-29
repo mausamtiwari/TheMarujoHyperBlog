@@ -1,6 +1,7 @@
 package be.intec.themarujohyperblog.service;
 
 import be.intec.themarujohyperblog.model.BlogPost;
+import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,5 +45,17 @@ public class PostServiceImpl implements PostService {
         //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
         return this.postRepository.findAll(pageable);
     }
+
+   @Override
+    public List<BlogPost> getPostsByUser(User user) {
+        return postRepository.findByUser(user);
+    }
+
+    @Override
+    public Page<BlogPost> findUserPostsPaginated(User user, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("createdAt").descending());
+        return this.postRepository.findByUser(user, pageable);
+    }
+
 
 }
