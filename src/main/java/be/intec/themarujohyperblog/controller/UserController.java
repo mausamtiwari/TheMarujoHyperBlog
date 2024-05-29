@@ -113,7 +113,7 @@ public class UserController {
         return "login";
     }*/
 
-    @PostMapping("/register")
+ /*   @PostMapping("/register")
     public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
         logger.info("Registering user: {}", user);
 
@@ -158,7 +158,7 @@ public class UserController {
         userService.registerUser(user);
         logger.info("User registered with username: {}", user.getUsername());
         return "redirect:/login";
-    }
+    }  */
 
     @GetMapping("/login")
     public String showLoginForm(@RequestParam(value = "error", required = false) String error, Model model) {
@@ -253,7 +253,7 @@ public class UserController {
         return "edit-profile";
     }
 
-    @PostMapping("/edit/{id}")
+ /*   @PostMapping("/edit/{id}")
     public String editUserProfile(@PathVariable("id") Long id, @Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
         logger.info("Attempting to update user profile: {}", user);
 
@@ -317,6 +317,69 @@ public class UserController {
         logger.info("User profile updated: {}", user);
 
         userService.updateUser(updatedUser);
+        return "redirect:/profile/" + id;
+    }   */
+
+
+    @PostMapping("/register")
+    public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
+        logger.info("Registering user: {}", user);
+
+        String validationResult = validateUser(user, result, model);
+        if (validationResult != null) {
+            return "register";
+        }
+
+        String checkResult = checkUsernameAndEmail(user, model);
+        if (checkResult != null) {
+            return "register";
+        }
+
+        // Register user if all checks pass
+        userService.registerUser(user);
+        logger.info("User registered with username: {}", user.getUsername());
+        return "redirect:/login";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String editUserProfile(@PathVariable("id") Long id, @Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
+        logger.info("Attempting to update user profile: {}", user);
+
+        String validationResult = validateUser(user, result, model);
+        if (validationResult != null) {
+            return "edit-profile";
+        }
+
+        // Retrieve the existing user from the database
+        Optional<User> existingUserOptional = userService.findUserById(id);
+        if (existingUserOptional.isEmpty()) {
+            logger.error("User with id {} not found", id);
+            model.addAttribute("error", "User not found.");
+            return "error";
+        }
+
+        User existingUser = existingUserOptional.get();
+
+        // Check if email is taken by another user
+        if (!existingUser.getEmail().equals(user.getEmail())) {
+            Optional<User> existingEmail = userService.findUserByEmail(user.getEmail());
+            if (existingEmail.isPresent()) {
+                logger.warn("Email already exists: {}", user.getEmail());
+                model.addAttribute("error", "Email already exists");
+                model.addAttribute("user", user);
+                return "edit-profile";
+            }
+        }
+
+        logger.info("Updating user profile for: {}", user);
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setLastName(user.getLastName());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setConfirmPassword(user.getConfirmPassword());
+        logger.info("User profile updated: {}", user);
+
+        userService.updateUser(existingUser);
         return "redirect:/profile/" + id;
     }
 
@@ -388,6 +451,65 @@ public class UserController {
         session.invalidate();
         return "redirect:/login?logout";
     }
+
+
+
+    // Validation for register and update methods.
+
+    private String validateUser(User user, BindingResult result, Model model) {
+        // Check for validation errors
+        if (result.hasErrors()) {
+            for (FieldError error : result.getFieldErrors()) {
+                logger.warn("Validation error: field: {}, message: {}", error.getField(), error.getDefaultMessage());
+                model.addAttribute("error", error.getDefaultMessage());
+                /*if ("password".equals(error.getField())) {
+                    logger.warn("Password validation error: {}", error.getDefaultMessage());
+                   // model.addAttribute("passwordError", error.getDefaultMessage());
+                }*/
+            }
+            model.addAttribute("user", user);
+            return "error";
+        }
+
+        // Ensure mandatory fields are not left empty
+        if (user.getFirstName().isEmpty() || user.getLastName().isEmpty() || user.getEmail().isEmpty() || user.getPassword().isEmpty() || user.getConfirmPassword().isEmpty()) {
+            logger.warn("One or more fields are empty");
+            model.addAttribute("error", "All fields are required.");
+            model.addAttribute("user", user);
+            return "error";
+        }
+
+        // Check for password match
+        if (!user.getPassword().equals(user.getConfirmPassword())) {
+            logger.warn("Passwords do not match");
+            model.addAttribute("error", "Passwords do not match");
+            model.addAttribute("user", user);
+            return "error";
+        }
+
+        return null;
+    }
+
+    private String checkUsernameAndEmail(User user, Model model) {
+        // Check if username is taken
+        Optional<User> existingUserName = userService.findByUserName(user.getUsername());
+        if (existingUserName.isPresent()) {
+            logger.warn("User already exists with username: {}", user.getUsername());
+            model.addAttribute("error", "Username already exists");
+            return "error";
+        }
+
+        // Check if email is taken
+        Optional<User> existingEmail = userService.findUserByEmail(user.getEmail());
+        if (existingEmail.isPresent()) {
+            logger.warn("User already exists with email: {}", user.getEmail());
+            model.addAttribute("error", "Email already exists");
+            return "error";
+        }
+
+        return null;
+    }
+
 
 
 }
