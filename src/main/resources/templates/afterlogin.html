@@ -101,7 +101,7 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                 <li><a class="dropdown-item" th:href="@{/showNewPostForm}">Create Post</a></li>
-                <li><a class="dropdown-item" th:href="@{/myPosts/{pageNo}}">Show my posts</a></li>
+                <li><a class="dropdown-item" th:href="@{/myPosts}">Show my posts</a></li>
                 <li><a class="dropdown-item" th:href="@{/profile/{id}(id=${session.loggedInUser.id})}">Profile</a></li>
                 <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
             </ul>

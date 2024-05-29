@@ -196,9 +196,18 @@ public class PostController {
         model.addAttribute("session", session);
         return "afterlogin";
     }*/
+   @GetMapping("/myPosts")
+   public String viewUserPosts(Model model, HttpSession session) {
+       User user = (User) session.getAttribute("loggedInUser");
+       if (user == null) {
+           return "redirect:/login";
+       }
+       List<BlogPost> userPosts = postService.getPostsByUser(user);
+       model.addAttribute("posts", userPosts);
+       return "userposts";
+   }
 
-
-    @GetMapping("/myPosts/{pageNo}")
+   /* @GetMapping("/myPosts/{pageNo}")
     public String viewUserPosts(@PathVariable(value = "pageNo") int pageNo, Model model, HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
@@ -213,7 +222,7 @@ public class PostController {
         model.addAttribute("posts", userPosts);
         return "userposts";
     }
-
+*/
     /*  @GetMapping("/showNewPostForm")
    public String showNewPostForm(Model model) {
        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

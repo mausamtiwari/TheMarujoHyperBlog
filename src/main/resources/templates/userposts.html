@@ -108,38 +108,24 @@
 
 
     <div class="container mt-4">
-        <div th:each="posts:${userPosts}">
+        <div th:each="post:${posts}">
             <article>
-                <h1 class="article-title" th:text="${posts.title}">Post Title</h1>
+                <h1 class="article-title" th:text="${post.title}">Post Title</h1>
                 <div class="d-flex align-items-center author-info mb-3">
                     <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" class="author-photo mr-2" alt="Author Photo">
                     <div>
-                        <span class="author-name" th:text="${posts.user.username}">Author Name</span> &middot;
+                        <span class="author-name" th:text="${post.user.username}">Author Name</span> &middot;
                         <span class="text-muted">4 min read</span> &middot;
-                        <span class="text-muted" th:text="${#dates.format(posts.createdAt, 'MMM d, yyyy')}">Date</span>
+                        <span class="text-muted" th:text="${#dates.format(post.createdAt, 'MMM d, yyyy')}">Date</span>
                     </div>
                 </div>
                 <div class="article-content">
-                    <p th:text="${posts.content}">Post Content</p>
+                    <p th:text="${post.content}">Post Content</p>
                 </div>
             </article>
         </div>
     </div>
-    <!-- Pagination Controls -->
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item" th:classappend="${currentPage == 1}? 'disabled'">
-                <a class="page-link" th:href="@{'/myPosts?page=' + ${currentPage - 1}}">Previous</a>
-            </li>
-            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
-                th:classappend="${i == currentPage}? 'active'">
-                <a class="page-link" th:href="@{'/myPosts?page=' + ${i}}" th:text="${i}">1</a>
-            </li>
-            <li class="page-item" th:classappend="${currentPage == totalPages}? 'disabled'">
-                <a class="page-link" th:href="@{'/myPosts?page=' + ${currentPage + 1}}">Next</a>
-            </li>
-        </ul>
-    </nav>
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -160,3 +146,20 @@
 </script>
 </body>
 </html>
+
+
+<!--
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item" th:classappend="${currentPage == 1}? 'disabled'">
+            <a class="page-link" th:href="@{'/myPosts?page=' + ${currentPage - 1}}">Previous</a>
+        </li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+            th:classappend="${i == currentPage}? 'active'">
+            <a class="page-link" th:href="@{'/myPosts?page=' + ${i}}" th:text="${i}">1</a>
+        </li>
+        <li class="page-item" th:classappend="${currentPage == totalPages}? 'disabled'">
+            <a class="page-link" th:href="@{'/myPosts?page=' + ${currentPage + 1}}">Next</a>
+        </li>
+    </ul>
+</nav>-->
