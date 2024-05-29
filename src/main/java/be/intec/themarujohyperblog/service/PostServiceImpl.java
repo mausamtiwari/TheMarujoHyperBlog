@@ -62,30 +62,42 @@ public class PostServiceImpl implements PostService{
         }
         return postOptional.get();
     }
-///////////////Add methods
+
     @Override
     public void deletePost(Long id) {
-
+        postRepository.deleteById(id);
     }
 
     @Override
     public Page<BlogPost> findPostPaginated(int pageNo, int pageSize) {
-        return null;
+        //Default versie, afnemende volgorde
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
+        //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
+        return this.postRepository.findAll(pageable);
     }
 
     @Override
     public Page<BlogPost> findPostPaginatedByIDUp(int pageNo, int pageSize) {
-        return null;
+        //Sorteert by ID in toenemende volgorde
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
+        //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
+        return this.postRepository.findAll(pageable);
     }
 
     @Override
     public Page<BlogPost> findPostPaginatedByIDDown(int pageNo, int pageSize) {
-        return null;
+        //Sorteert by ID in afnemende volgorde
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
+        //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
+        return this.postRepository.findAll(pageable);
     }
 
     @Override
     public Page<BlogPost> searchPostDescription(String search) {
-        return null;
+        return postRepository.findByDescriptionContaining(search, PageRequest.of(0, 6));
     }
 
     //missing?
