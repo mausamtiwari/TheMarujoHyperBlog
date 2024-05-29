@@ -185,44 +185,46 @@ public class PostController {
         return "afterlogin";
     }*/
 
-   /* @GetMapping("/afterlogin")
+    @GetMapping("/afterlogin")
     public String afterLogin(Model model, HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
             return "redirect:/login";
         }
-        List<BlogPost> posts = postService.getPostsByUser(user);
-        model.addAttribute("posts", posts);
-        model.addAttribute("session", session);
+        List<BlogPost> getPosts = postService.getPostsByUser(user);
+        model.addAttribute("posts", getPosts);
+        //model.addAttribute("session", session);
         return "afterlogin";
-    }*/
-   @GetMapping("/myPosts")
-   public String viewUserPosts(Model model, HttpSession session) {
-       User user = (User) session.getAttribute("loggedInUser");
-       if (user == null) {
-           return "redirect:/login";
-       }
-       List<BlogPost> userPosts = postService.getPostsByUser(user);
-       model.addAttribute("posts", userPosts);
-       return "userposts";
-   }
+    }
 
-   /* @GetMapping("/myPosts/{pageNo}")
-    public String viewUserPosts(@PathVariable(value = "pageNo") int pageNo, Model model, HttpSession session) {
+
+    @GetMapping("/myPosts")
+    public String viewUserPosts(Model model, HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
             return "redirect:/login";
         }
-        int pageSize = 6; // a number of posts per page
-        Page<BlogPost> page = postService.findUserPostsPaginated(user, pageNo, pageSize);
-        List<BlogPost> userPosts = page.getContent();
-        model.addAttribute("currentPage", pageNo);
-        model.addAttribute("totalPages", page.getTotalPages());
-        model.addAttribute("totalItems", page.getTotalElements());
+        List<BlogPost> userPosts = postService.getPostsByUser(user);
         model.addAttribute("posts", userPosts);
         return "userposts";
     }
-*/
+
+    /* @GetMapping("/myPosts/{pageNo}")
+     public String viewUserPosts(@PathVariable(value = "pageNo") int pageNo, Model model, HttpSession session) {
+         User user = (User) session.getAttribute("loggedInUser");
+         if (user == null) {
+             return "redirect:/login";
+         }
+         int pageSize = 6; // a number of posts per page
+         Page<BlogPost> page = postService.findUserPostsPaginated(user, pageNo, pageSize);
+         List<BlogPost> userPosts = page.getContent();
+         model.addAttribute("currentPage", pageNo);
+         model.addAttribute("totalPages", page.getTotalPages());
+         model.addAttribute("totalItems", page.getTotalElements());
+         model.addAttribute("posts", userPosts);
+         return "userposts";
+     }
+ */
     /*  @GetMapping("/showNewPostForm")
    public String showNewPostForm(Model model) {
        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

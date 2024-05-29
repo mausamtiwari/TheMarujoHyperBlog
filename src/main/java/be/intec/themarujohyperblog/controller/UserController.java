@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -191,7 +192,10 @@ public class UserController {
         session.setAttribute("username", username); // Store username in the session
         // System.out.println(username + " logged in successfully");
         session.setAttribute("loggedInUser", user);
-        model.addAttribute("user", user);
+         model.addAttribute("user", user);
+        List<BlogPost> posts = postService.getAllPosts();
+        model.addAttribute("posts", posts);
+
         return "afterlogin";
     }
 
