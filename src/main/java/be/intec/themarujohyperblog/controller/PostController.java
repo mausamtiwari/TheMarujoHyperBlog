@@ -98,8 +98,12 @@ import be.intec.themarujohyperblog.model.Like;
 import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.service.*;
+import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -108,14 +112,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-
 @Controller
-@RequestMapping("/")
 public class PostController {
 
     private final PostServiceImpl postService;
     private final UserServiceImpl userService;
     private final LikeServiceImpl likeService;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     public PostController(PostServiceImpl postService, UserServiceImpl userService, LikeServiceImpl likeService) {
@@ -126,36 +129,131 @@ public class PostController {
 
     @GetMapping("/")  //root, eerste pagina
     public String viewHomePage(Model model) {
-        return findPostPaginated(1,model); //dit beperkt ons tot 1 pagina?
+        return findPostPaginated(1, model); //dit beperkt ons tot 1 pagina?
     }
 
-   /* @GetMapping("/{id}")
-    public String getPostById(@PathVariable("id") Long id, Model model) {
-        Optional<BlogPost> post = Optional.ofNullable(postService.findPostPaginated()ById(id));
-        if (post.isPresent()) {
-            model.addAttribute("post", post.get());
-            return "post-details";
-        } else {
-            return "error";
-        }
-    }
-*/
+    /* @GetMapping("/{id}")
+     public String getPostById(@PathVariable("id") Long id, Model model) {
+         Optional<BlogPost> post = Optional.ofNullable(postService.findPostPaginated()ById(id));
+         if (post.isPresent()) {
+             model.addAttribute("post", post.get());
+             return "post-details";
+         } else {
+             return "error";
+         }
+     }
+ */
     @GetMapping("/showNewPostForm")
-    public String showCreatePostForm(Model model) {
+    public String showCreatePostForm(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         BlogPost post = new BlogPost();
         model.addAttribute("post", post);
         return "createpost";
     }
 
     @PostMapping("/createPost")
-    public String savePost(BlogPost post) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    public String createPost(@ModelAttribute("post") BlogPost post, HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            logger.warn("User session not found, redirecting to login.");
+            return "redirect:/login";
+        }
+        List<BlogPost> userPosts = postService.getPostsByUser(user);
+        logger.info("Creating post for user: {}", user.getUsername());
+        post.setUser(user);
+        postService.savePost(post);
+        model.addAttribute("posts", userPosts);
+        return "userposts";
+    }
+
+   /* @GetMapping("/afterlogin")
+    public String afterLogin(Model model, HttpSession session, @RequestParam(value = "page", defaultValue = "1") int page) {
+        int pageSize = 6; // number of posts per page
+        Page<BlogPost> postPage = postService.findPostPaginated(page, pageSize);
+        List<BlogPost> posts = postPage.getContent();
+
+        logger.info("Rendering afterlogin with currentPage: {}, totalPages: {}", page, postPage.getTotalPages());
+
+        model.addAttribute("posts", posts);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", postPage.getTotalPages());
+        model.addAttribute("session", session);
+        return "afterlogin";
+    }*/
+
+    @GetMapping("/afterlogin")
+    public String afterLogin(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        List<BlogPost> getPosts = postService.getPostsByUser(user);
+        model.addAttribute("posts", getPosts);
+        //model.addAttribute("session", session);
+        return "afterlogin";
+    }
+
+
+    @GetMapping("/myPosts")
+    public String viewUserPosts(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        List<BlogPost> userPosts = postService.getPostsByUser(user);
+        model.addAttribute("posts", userPosts);
+        return "userposts";
+    }
+
+    /* @GetMapping("/myPosts/{pageNo}")
+     public String viewUserPosts(@PathVariable(value = "pageNo") int pageNo, Model model, HttpSession session) {
+         User user = (User) session.getAttribute("loggedInUser");
+         if (user == null) {
+             return "redirect:/login";
+         }
+         int pageSize = 6; // a number of posts per page
+         Page<BlogPost> page = postService.findUserPostsPaginated(user, pageNo, pageSize);
+         List<BlogPost> userPosts = page.getContent();
+         model.addAttribute("currentPage", pageNo);
+         model.addAttribute("totalPages", page.getTotalPages());
+         model.addAttribute("totalItems", page.getTotalElements());
+         model.addAttribute("posts", userPosts);
+         return "userposts";
+     }
+ */
+    /*  @GetMapping("/showNewPostForm")
+   public String showNewPostForm(Model model) {
+       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       if (authentication != null && authentication.isAuthenticated() && !authentication.getName().equals("anonymousUser")) {
+           String username = authentication.getName();
+           User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
+           model.addAttribute("user", user);
+       } else {
+           return "createpost";
+       }
+
+       BlogPost post = new BlogPost();
+       model.addAttribute("post", post);
+       return "createpost";
+   }
+
+    @PostMapping("/createPost")
+    public String createPost(@ModelAttribute("post") BlogPost post) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getName().equals("anonymousUser")) {
+            throw new IllegalArgumentException("Invalid username: anonymousUser");
+        }
+
+        String username = authentication.getName();
         User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
         post.setUser(user);
         postService.savePost(post);
-        return "redirect:/";
-    }
-
+        return "afterlogin";
+    }*/
     @GetMapping("/updatePost/{id}")
     public String showUpdatePostForm(@PathVariable("id") Long postId, Model model) {
         BlogPost post = postService.getPostById(postId);
@@ -188,7 +286,6 @@ public class PostController {
         likeService.deleteLike(id);
     }
 
-
     @GetMapping("/page/{pageNo}")
     public String findPostPaginated(@PathVariable(value = "pageNo") int pageNo, Model model) {
         int pageSize = 6; //aantal posts op één pagina is 6;
@@ -201,4 +298,3 @@ public class PostController {
         return "blogcentral";
     }
 }
-

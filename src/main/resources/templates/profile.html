@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Profile</title>
+    <title>Blog Home</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Optional custom CSS for sidebar styling */
         .sidebar-container {
-            background-color: lightblue; /* Set background color for sidebar container */
+            background-color: #343a40;
             padding: 15px;
             height: 100vh;
             position: fixed;
             top: 0;
-            left: 0;
-            width: 200px; /* Adjust based on sidebar width */
+            right: 0;
+            width: 150px;
+            color: #fff;
+            font-family: Arial, sans-serif;
         }
         .sidebar {
             height: 100%;
+            margin-top: 1.7cm;
         }
         .sidebar a {
-            color: #333;
+            color: #fff;
             text-decoration: none;
             display: block;
             margin: 10px 0;
@@ -27,32 +29,98 @@
             text-decoration: underline;
         }
         .main-content {
-            margin-left: 200px; /* Adjust based on sidebar width */
+            margin-right: 220px;
             padding: 20px;
+        }
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+        .profile-picture {
+            max-width: 150px;
+            max-height: 150px;
+        }
+        .user-avatar {
+            width: 50px; /* Adjust as needed */
+            height: 50px; /* Adjust as needed */
+            border-radius: 50%; /* To make it circular */
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .user-name {
+            margin-left: 10px;
         }
     </style>
 </head>
 <body>
-<div class="container-fluid">
+<!-- Responsive navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#!">Welcome bloggers</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="/login">Log in</a></li>
+                <li class="nav-item"><a class="nav-link" href="/register">Sign up</a></li>
+                <li class="nav-item"><a class="nav-link" href="/search">Search</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logout">Log out</a></li>
+                <li class="nav-item dropdown">
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- Page header with logo and tagline -->
+<header class="py-5 bg-light border-bottom mb-4">
+    <div class="container">
+        <div class="text-center my-5">
+            <h1 class="fw-bolder">Welcome to the Blog Home!</h1>
+        </div>
+    </div>
+</header>
+<!-- Page content -->
+<div class="container">
     <div class="row">
         <!-- Sidebar -->
         <div class="col-md-3 sidebar-container">
             <div class="sidebar">
-                <h4>Navigation</h4>
-                <a href="/">Home</a>
-                <a href="/blogcentral.html">BlogCentral</a>
-                <!-- Add more links as needed -->
+                <!-- Display user-name and avatar -->
+                <div class="user-info">
+                    <img id="user-avatar" class="user-avatar" src="" alt="User Avatar"> <!-- Placeholder for user avatar -->
+                    <span id="user-name" class="user-name"></span> <!-- Placeholder for user name -->
+                </div>
+                <hr>
+                <!-- Display online users count -->
+                <div>
+                    <p>Online Users: <span id="online-users-count">0</span></p>
+                </div>
+                <!-- Display total visitors count -->
+                <div>
+                    <p>Total Visitors: <span id="total-visitors-count">0</span></p>
+                </div>
             </div>
         </div>
-
         <!-- Main content -->
         <div class="col-md-9 main-content">
-            <h2>User Profile</h2>
             <div>
                 <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
                 <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
                 <div th:if="${user.profilePicture != null}">
-                    <img th:src="@{'/uploads/' + ${user.profilePicture}}" alt="Profile Picture" class="img-thumbnail" />
+                    <img th:src="@{'/uploads/' + ${user.profilePicture}}" alt="Profile Picture" class="img-thumbnail profile-picture" />
                     <form th:action="@{/delete-picture/{id}(id=${user.id})}" method="post">
                         <button type="submit" class="btn btn-danger">Delete Picture</button>
                     </form>
@@ -66,40 +134,122 @@
                         <button type="submit" class="btn btn-primary">Upload</button>
                     </form>
                 </div>
-                <a th:href="@{/edit/{id}(id=${user.id})}" class="btn btn-secondary">Edit Profile</a>
-                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">
-                    Delete Profile
-                </button>
+                <hr> <!-- Add a horizontal line for separation -->
+                <div class="mt-3">
+                    <a th:href="@{/edit/{id}(id=${user.id})}" class="btn btn-secondary">Edit Profile</a>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">
+                        Delete Profile
+                    </button>
+                </div>
+            </div>
+
+            <!-- "Create New Blog Post" Option -->
+            <div class="text-center mt-4">
+                <a href="/" class="btn btn-primary">Create New Blog Post</a>
+            </div>
+
+            <!-- Display all blog posts of the user -->
+            <div class="mt-4">
+                <h2>All Blog Posts</h2>
+                <div th:each="post : ${user.blogPosts}">
+                    <h3 th:text="${post.title}"></h3>
+                    <p th:text="${post.content}"></p>
+                </div>
+            </div>
+            <!-- Delete Confirmation Modal -->
+            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete your profile? This action cannot be undone.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                            <form th:action="@{/user/delete/{id}(id=${user.id})}" method="post">
+                                <button type="submit" class="btn btn-danger">Yes, delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete your profile? This action cannot be undone.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                <form th:action="@{/user/delete/{id}(id=${user.id})}" method="post">
-                    <button type="submit" class="btn btn-danger">Yes, delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Function to fetch user data from the server
+    function fetchUserData() {
+        // Make an AJAX request to fetch user data
+        // Example using jQuery's $.ajax() method
+        $.ajax({
+            url: '/api/getUserData', // Replace with your endpoint to fetch user data
+            method: 'GET',
+            success: function(response) {
+                // Update user data in the sidebar
+                document.getElementById('user-avatar').src = response.avatarUrl;
+                document.getElementById('user-name').textContent = response.name;
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching user data:', error);
+            }
+        });
+    }
+
+    // Function to fetch online users count from the server
+    function fetchOnlineUsersCount() {
+        // Make an AJAX request to fetch online users count
+        // Example using jQuery's $.ajax() method
+        $.ajax({
+            url: '/api/getOnlineUsersCount', // Replace with your endpoint to fetch online users count
+            method: 'GET',
+            success: function(response) {
+                // Update online users count
+                document.getElementById('online-users-count').textContent = response.onlineUsersCount;
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching online users count:', error);
+            }
+        });
+    }
+
+    // Function to fetch total visitors count from the server
+    function fetchTotalVisitorsCount() {
+        // Make an AJAX request to fetch total visitors count
+        // Example using jQuery's $.ajax() method
+        $.ajax({
+            url: '/api/getTotalVisitorsCount', // Replace with your endpoint to fetch total visitors count
+            method: 'GET',
+            success: function(response) {
+                // Update total visitors count (rounded up)
+                document.getElementById('total-visitors-count').textContent = Math.ceil(response.totalVisitorsCount);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching total visitors count:', error);
+            }
+        });
+    }
+
+    // Call the functions initially to fetch and update the data
+    fetchUserData();
+    fetchOnlineUsersCount();
+    fetchTotalVisitorsCount();
+
+    // Set intervals to periodically update the data
+    setInterval(fetchUserData, 60000); // Update user data every minute
+    setInterval(fetchOnlineUsersCount, 60000); // Update online users count every minute
+    setInterval(fetchTotalVisitorsCount, 60000); // Update total visitors count every minute
+
+
+</script>
 </body>
 </html>
