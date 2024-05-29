@@ -177,7 +177,21 @@ public class PostController {
         postService.savePost(post);
         return "redirect:/posts/" + id;
     }
+    @GetMapping("/blogpostdetail/{postId}")
+    public String showBlogPostDetail(@PathVariable Long postId, Model model) {
+        // Retrieve blog post details based on postId
+        BlogPost post = postService.getPostById(postId);
 
+        // Log post attributes
+        logger.info("Post ID: {}", post.getId());
+        logger.info("Post Title: {}", post.getTitle());
+        logger.info("Post Content: {}", post.getContent());
+
+        // Add post to the model
+        model.addAttribute("post", post);
+
+        return "blogpostdetail";
+    }
     @PostMapping("/deletePost/{id}")
     public String deletePost(@PathVariable("id") Long postId) {
         postService.deletePost(postId);

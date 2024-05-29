@@ -4,24 +4,23 @@
     <title>Blog Home</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Optional custom CSS for sidebar styling */
         .sidebar-container {
-            background-color: #007bff;
+            background-color: black;
             padding: 15px;
             height: 100vh;
             position: fixed;
             top: 0;
-            right: 0; /* Position the sidebar to the right */
+            right: 0;
             width: 200px;
-            color: #fff; /* Text color */
-            font-family: Arial, sans-serif; /* Font family */
+            color: #fff;
+            font-family: Arial, sans-serif;
         }
         .sidebar {
             height: 100%;
             margin-top: 1.7cm;
         }
         .sidebar a {
-            color: #fff; /* Link color */
+            color: #fff;
             text-decoration: none;
             display: block;
             margin: 10px 0;
@@ -30,30 +29,58 @@
             text-decoration: underline;
         }
         .main-content {
-            margin-right: 220px; /* Adjust based on sidebar width */
+            margin-right: 220px;
             padding: 20px;
         }
         .header {
-            background-color: #007bff; /* Primary color */
-            color: #fff; /* Text color */
+            background-color: #007bff;
+            color: #fff;
             padding: 20px;
             text-align: center;
             margin-bottom: 20px;
-            font-family: Arial, sans-serif; /* Font family */
+            font-family: Arial, sans-serif;
         }
         .header h1 {
             margin: 0;
             font-size: 36px;
         }
+        .profile-picture {
+            max-width: 150px;
+            max-height: 150px;
+        }
     </style>
 </head>
 <body>
-<div class="container-fluid">
-    <div class="row">
-        <!-- Header -->
-        <div class="col-12 header">
-            <h1>Welcome to Blog Home</h1>
+<!-- Responsive navbar-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#!">Welcome bloggers</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="/login">Log in </a></li>
+                <li class="nav-item"><a class="nav-link" href="/register">Sign up</a></li>
+                <li class="nav-item"><a class="nav-link" href="/search">Search in blog descriptions</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li>
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Blog</a></li>
+            </ul>
         </div>
+    </div>
+</nav>
+<!-- Page header with logo and tagline-->
+<header class="py-5 bg-light border-bottom mb-4">
+    <div class="container">
+        <div class="text-center my-5">
+            <h1 class="fw-bolder">Welcome to the Blog Home!</h1>
+        </div>
+    </div>
+</header>
+<!-- Page content-->
+<div class="container">
+    <div class="row">
+        <!-- Blog entries-->
+        <!-- Container for the main content -->
+        <div class="container mt-4">
     </div>
     <div class="row">
         <!-- Sidebar -->
@@ -73,7 +100,7 @@
                 <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
                 <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
                 <div th:if="${user.profilePicture != null}">
-                    <img th:src="@{'/uploads/' + ${user.profilePicture}}" alt="Profile Picture" class="img-thumbnail" />
+                    <img th:src="@{'/uploads/' + ${user.profilePicture}}" alt="Profile Picture" class="img-thumbnail profile-picture" />
                     <form th:action="@{/delete-picture/{id}(id=${user.id})}" method="post">
                         <button type="submit" class="btn btn-danger">Delete Picture</button>
                     </form>
@@ -87,6 +114,8 @@
                         <button type="submit" class="btn btn-primary">Upload</button>
                     </form>
                 </div>
+                <hr> <!-- Add a horizontal line for separation -->
+                <div class="mt-3">
                 <a th:href="@{/edit/{id}(id=${user.id})}" class="btn btn-secondary">Edit Profile</a>
                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">
                     Delete Profile
