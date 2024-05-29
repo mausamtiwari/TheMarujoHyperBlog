@@ -120,6 +120,7 @@ public class UserController {
         // Check for validation errors
         if (result.hasErrors()) {
             for (FieldError error : result.getFieldErrors()) {
+                model.addAttribute("error", error.getDefaultMessage());
                 logger.warn("Validation error: field: {}, message: {}", error.getField(), error.getDefaultMessage());
                 // Check if the error is related to the password field
                 if ("password".equals(error.getField())) {
@@ -254,9 +255,23 @@ public class UserController {
 
     @PostMapping("/edit/{id}")
     public String editUserProfile(@PathVariable("id") Long id, @Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
+        logger.info("Attempting to update user profile: {}", user);
+
+        // Check for validation errors
         if (result.hasErrors()) {
+            for (FieldError error : result.getFieldErrors()) {
+                logger.warn("Validation error: field: {}, message: {}", error.getField(), error.getDefaultMessage());
+                model.addAttribute("error", error.getDefaultMessage());
+                if ("password".equals(error.getField())) {
+                    logger.warn("Password validation error: {}", error.getDefaultMessage());
+                    model.addAttribute("passwordError", error.getDefaultMessage());
+                }
+            }
+            model.addAttribute("user", user);
             return "edit-profile";
         }
+
+        // Retrieve the existing user from the database
         Optional<User> existingUser = userService.findUserById(id);
         if (existingUser.isEmpty()) {
             logger.error("User with id {} not found", id);
@@ -265,15 +280,48 @@ public class UserController {
         }
 
         User updatedUser = existingUser.get();
+
+        // Check if email is taken by another user
+        if (!updatedUser.getEmail().equals(user.getEmail())) {
+            Optional<User> existingEmail = userService.findUserByEmail(user.getEmail());
+            if (existingEmail.isPresent()) {
+                logger.warn("Email already exists: {}", user.getEmail());
+                model.addAttribute("error", "Email already exists");
+                model.addAttribute("user", user);
+                return "edit-profile";
+            }
+        }
+
+        // Check for password match
+        if (!user.getPassword().equals(user.getConfirmPassword())) {
+            logger.warn("Passwords do not match");
+            model.addAttribute("error", "Passwords do not match");
+            model.addAttribute("user", user);
+            return "edit-profile";
+        }
+
+        // Ensure mandatory fields are not left empty
+        if (user.getFirstName().isEmpty() || user.getLastName().isEmpty() || user.getEmail().isEmpty() || user.getPassword().isEmpty() || user.getConfirmPassword().isEmpty()) {
+            logger.warn("One or more fields are empty");
+            model.addAttribute("error", "All fields are required.");
+            model.addAttribute("user", user);
+            return "edit-profile";
+        }
+
+        logger.info("Updating user profile for: {}", user);
         updatedUser.setFirstName(user.getFirstName());
         updatedUser.setLastName(user.getLastName());
         updatedUser.setEmail(user.getEmail());
         updatedUser.setPassword(user.getPassword());
         updatedUser.setConfirmPassword(user.getConfirmPassword());
+        logger.info("User profile updated: {}", user);
 
-        userService.registerUser(updatedUser);
-        return "redirect:/profile";
+        userService.updateUser(updatedUser);
+        return "redirect:/profile/" + id;
     }
+
+
+
 
     @PostMapping("/user/delete/{id}")
     public String deleteUserProfile(@PathVariable("id") Long id, Model model) {

@@ -77,7 +77,9 @@
 <div class="container mt-4">
     <header class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
-            <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" width="30" height="30" alt="Medium Logo" class="mr-2">
+            <a th:href="@{/afterlogin}">
+                <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" width="125" height="125" alt="Medium Logo" class="rounded-circle mr-2">
+            </a>
             <span class="font-weight-bold">Marujo</span>
         </div>
         <form class="form-inline my-2 my-lg-0">
@@ -93,7 +95,7 @@
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="userDropdown"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" alt="User Profile" width="30" height="30"
-                     class="rounded-circle mr-2">
+                     class="rounded-circle mr-2" th:href="@{/afterlogin}">
                 <span th:text="${session.loggedInUser.username}">Username</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
@@ -136,7 +138,7 @@
 </script>
 <script>
     function goBack() {
-        window.history.length > 1? window.history.go(-1) : window.location.href = "/";
+        window.history.length > 1 ? window.history.go(-1) : window.location.href = "/";
     }
 </script>
 </body>
