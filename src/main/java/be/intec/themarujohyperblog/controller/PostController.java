@@ -98,13 +98,15 @@ import be.intec.themarujohyperblog.model.Like;
 import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.service.*;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
 
@@ -112,7 +114,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/")
 public class PostController {
-
+    private final Logger logger = LoggerFactory.getLogger(PostController.class);
     private final PostServiceImpl postService;
     private final UserServiceImpl userService;
     private final LikeServiceImpl likeService;
@@ -148,12 +150,18 @@ public class PostController {
     }
 
     @PostMapping("/createPost")
-    public String savePost(BlogPost post) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
+    public String createPost(@ModelAttribute("post") BlogPost post, HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            logger.warn("User session not found, redirecting to login.");
+            return "redirect:/login";
+        }
+        List<BlogPost> userPosts = postService.getPostsByUser(user);
+        logger.info("Creating post for user: {}", user.getUsername());
         post.setUser(user);
         postService.savePost(post);
-        return "redirect:/";
+        model.addAttribute("posts", userPosts);
+        return "afterlogin";
     }
 
     @GetMapping("/updatePost/{id}")

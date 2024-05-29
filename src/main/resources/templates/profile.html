@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Profile</title>
+    <title>Blog Home</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Optional custom CSS for sidebar styling */
         .sidebar-container {
-            background-color: lightblue; /* Set background color for sidebar container */
+            background-color: #007bff;
             padding: 15px;
             height: 100vh;
             position: fixed;
             top: 0;
-            left: 0;
-            width: 200px; /* Adjust based on sidebar width */
+            right: 0; /* Position the sidebar to the right */
+            width: 200px;
+            color: #fff; /* Text color */
+            font-family: Arial, sans-serif; /* Font family */
         }
         .sidebar {
             height: 100%;
+            margin-top: 1.7cm;
         }
         .sidebar a {
-            color: #333;
+            color: #fff; /* Link color */
             text-decoration: none;
             display: block;
             margin: 10px 0;
@@ -27,27 +30,45 @@
             text-decoration: underline;
         }
         .main-content {
-            margin-left: 200px; /* Adjust based on sidebar width */
+            margin-right: 220px; /* Adjust based on sidebar width */
             padding: 20px;
+        }
+        .header {
+            background-color: #007bff; /* Primary color */
+            color: #fff; /* Text color */
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: Arial, sans-serif; /* Font family */
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
         }
     </style>
 </head>
 <body>
 <div class="container-fluid">
     <div class="row">
+        <!-- Header -->
+        <div class="col-12 header">
+            <h1>Welcome to Blog Home</h1>
+        </div>
+    </div>
+    <div class="row">
         <!-- Sidebar -->
         <div class="col-md-3 sidebar-container">
             <div class="sidebar">
                 <h4>Navigation</h4>
-                <a href="/">Home</a>
-                <a href="/blogcentral.html">BlogCentral</a>
+                <a href="bloghome.html">Blog Home</a>
+                <a href="/blogcentral.html">Blog Central</a>
+                <a href="blogpostdetail.html">Create New Blog Post</a>
                 <!-- Add more links as needed -->
             </div>
         </div>
 
         <!-- Main content -->
         <div class="col-md-9 main-content">
-            <h2>User Profile</h2>
             <div>
                 <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
                 <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
@@ -71,6 +92,7 @@
                     Delete Profile
                 </button>
             </div>
+
         </div>
     </div>
 </div>
@@ -101,5 +123,11 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function sortPosts(select) {
+        const sortOrder = select.value;
+        window.location.href = `?sort=${sortOrder}`;
+    }
+</script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 package be.intec.themarujohyperblog.service;
 
 import be.intec.themarujohyperblog.model.BlogPost;
+import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,10 @@ public class PostServiceImpl implements PostService {
         }
         return postOptional.get();
     }
-
+    @Override
+    public List<BlogPost> getPostsByUser(User user) {
+        return postRepository.findByUser(user);
+    }
     public void savePost(BlogPost blogPost) {
         postRepository.save(blogPost);
     }
