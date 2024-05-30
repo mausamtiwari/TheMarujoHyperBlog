@@ -38,13 +38,13 @@
         <main class="col-md-9 col-lg-10">
             <!-- Author Mini Profile -->
             <section class="author-profile mb-4 text-center">
-               <!-- <h2 th:text="${user.username}">Author Name</h2>-->
-               <!-- <img th:src="@{/avatars/{user.avatar}}" th:alt="${user.username} + ' Avatar'" class="rounded-circle" width="150">-->
+               <h2 th:text="${user.username}">Author Name</h2>
+               <img th:src="@{/avatars/{user.avatar}}" th:alt="${user.username} + ' Avatar'" class="rounded-circle" width="150">
              </section>
 
              <!-- Blog Posts -->
             <section class="blog-posts">
-                <!--<h2>All Blog Posts by <span th:text="${user.username}"></span></h2>-->
+                <h2>All Blog Posts by <span th:text="${user.username}"></span></h2>
                 <!-- Sort options -->
                 <div class="mb-3">
                     <label for="sort-select" class="form-label">Sort by:</label>

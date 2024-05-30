@@ -1,6 +1,7 @@
 package be.intec.themarujohyperblog.model;
 
 //import be.intec.themarujohyperblog.config.PasswordMatches;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -30,10 +31,10 @@ public class User {
     private String username;
 
     @NotBlank(message = "Password is required")
-   /*@Pattern(
+    @Pattern(
             regexp = "^(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{1,10}$",
             message = "Password must contain at least one capital letter, one special character, letters, and numbers, and must be a maximum of 10 characters long."
-    )*/
+    )
     private String password;
 
     @Transient

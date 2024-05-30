@@ -31,12 +31,7 @@ public class SecurityConfig {
                                 .defaultSuccessUrl("/afterlogin", true)
                                 .permitAll()
                 )
-                .logout(logout ->
-                logout
-                    .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login?logout=true")
-                    .permitAll()
-            )*/
+                */
                 .oauth2Login(oauth2Login ->
                         oauth2Login
                                 .loginPage("/login")
@@ -55,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler oauth2SuccessHandler() {
         return (request, response, authentication) -> {
-            response.sendRedirect("/afterlogin");
+            response.sendRedirect("redirect:/afterlogin");
         };
     }
 

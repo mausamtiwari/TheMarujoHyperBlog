@@ -14,6 +14,10 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   security:
     oauth2:
       client:
@@ -21,20 +25,26 @@ spring:
           google:
             client-id: 514051386784-i4n1leb6rjk8h5hbovtnfquhlb4o0as1.apps.googleusercontent.com
             client-secret: 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
-            scope: profile, email
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            #scope: profile, email
+            #redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            #authorization-grant-type: authorization_code
+            client-authentication-method: post
           github:
             client-id: Iv23li3nWCIgsN6jc4Y4
             client-secret: 34cda707ce8f034449684c050c8e56263277f240
-        provider:
-          google:
-            authorization-uri: https://accounts.google.com/o/oauth2/auth
-            token-uri: https://oauth2.googleapis.com/token
-            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
-          github:
-            authorization-uri: https://github.com/login/oauth/authorize
-            token-uri: https://github.com/login/oauth/access_token
-            user-info-uri: https://api.github.com/user
+            #scope: profile, email
+            #authorization-grant-type: authorization_code
+            #client-authentication-method: post
+          #provider:
+            #google:
+            #authorization-uri: https://accounts.google.com/o/oauth2/auth
+            #token-uri: https://oauth2.googleapis.com/token
+            #user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            #user-name-attribute: sub
+            #github:
+            #authorization-uri: https://github.com/login/oauth/authorize
+            #token-uri: https://github.com/login/oauth/access_token
+            #user-info-uri: https://api.github.com/user
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -44,6 +54,11 @@ logging:
   level:
     org.springframework: INFO
     be.intec.themarujohyperblog: DEBUG
+
+
+server:
+  tomcat:
+    max-http-form-post-size: 10MB
 
 
 
