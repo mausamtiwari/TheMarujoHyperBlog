@@ -130,7 +130,7 @@ public class PostController {
 
     @GetMapping("/")  //root, eerste pagina
     public String viewHomePage(Model model) {
-        return findPostPaginated(1, model); //dit beperkt ons tot 1 pagina?
+        return findPostPaginated(1, model); //Begint met pagina 1
     }
 
     /* @GetMapping("/{id}")
@@ -274,7 +274,7 @@ public class PostController {
     public String updatePost(@PathVariable("id") Long id, @ModelAttribute("post") BlogPost post) {
         post.setId(id);
         postService.savePost(post);
-        return "redirect:/posts/" + id;
+        return "redirect:/myPosts" + id;
     }
 
     @PostMapping("/deletePost/{id}")
@@ -306,5 +306,15 @@ public class PostController {
         model.addAttribute("postList", postList);
         return "blogcentral";
     }
+
+    //method om individuele post te bekijken
+    @PostMapping("/viewPost/{id}")
+    public String viewPost(@PathVariable("id") Long id, Model model) {
+        BlogPost post = postService.getPostById(id);
+        model.addAttribute("post", post);
+        return "blogpostdetail";
+    }
+
+
 }
 
