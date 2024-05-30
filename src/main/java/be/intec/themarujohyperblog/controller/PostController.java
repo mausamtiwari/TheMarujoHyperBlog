@@ -109,6 +109,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -162,8 +163,16 @@ public class PostController {
             logger.warn("User session not found, redirecting to login.");
             return "redirect:/login";
         }
+
+        if (post.getDescription() == null || post.getDescription().trim().isEmpty()) {
+            post.setDescription("No description available");
+        }
+
+
         List<BlogPost> userPosts = postService.getPostsByUser(user);
         logger.info("Creating post for user: {}", user.getUsername());
+        post.setCreatedAt(new Date());//JDR
+        post.setUpdatedAt(new Date());//JDR
         post.setUser(user);
         postService.savePost(post);
         model.addAttribute("posts", userPosts);
