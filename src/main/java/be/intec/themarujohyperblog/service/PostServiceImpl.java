@@ -29,10 +29,7 @@ public class PostServiceImpl implements PostService {
         }
         return postOptional.get();
     }
-    @Override
-    public List<BlogPost> getPostsByUser(User user) {
-        return postRepository.findByUser(user);
-    }
+
     public void savePost(BlogPost blogPost) {
         postRepository.save(blogPost);
     }
@@ -48,5 +45,17 @@ public class PostServiceImpl implements PostService {
         //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
         return this.postRepository.findAll(pageable);
     }
+
+    @Override
+    public List<BlogPost> getPostsByUser(User user) {
+        return postRepository.findByUser(user);
+    }
+
+    @Override
+    public Page<BlogPost> findUserPostsPaginated(User user, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("createdAt").descending());
+        return this.postRepository.findByUser(user, pageable);
+    }
+
 
 }
