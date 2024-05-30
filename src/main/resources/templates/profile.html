@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>After Login</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Profile</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -80,7 +80,7 @@
 <div class="container mt-4">
     <header class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
-            <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" width="30" height="30" alt="Medium Logo" class="mr-2">
+            <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" width="30" height="30" alt="Marujo Logo" class="mr-2">
             <span class="font-weight-bold">Marujo</span>
         </div>
         <form class="form-inline my-2 my-lg-0">
@@ -101,30 +101,59 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                 <li><a class="dropdown-item" th:href="@{/showNewPostForm}">Create Post</a></li>
+                <li><a class="dropdown-item" th:href="@{/afterlogin}">Go to HomePage</a></li>
                 <li><a class="dropdown-item" th:href="@{/myPosts}">Show my posts</a></li>
-                <li><a class="dropdown-item" th:href="@{/profile/{id}(id=${session.loggedInUser.id})}">Profile</a></li>
                 <li><a class="dropdown-item" onclick="goBack()">Go Back</a></li>
                 <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
             </ul>
         </div>
     </header>
+    <h2>My Profile</h2>
+    <div>
+        <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+        <div th:if="${user.profilePicture != null}">
+            <img th:src="@{'/uploads/' + ${user.profilePicture}}" alt="Profile Picture" class="img-thumbnail"/>
+            <form th:action="@{/delete-picture/{id}(id=${user.id})}" method="post">
+                <button type="submit" class="btn btn-danger">Delete Picture</button>
+            </form>
+        </div>
+        <div th:if="${user.profilePicture == null}">
+            <form th:action="@{/upload/{id}(id=${user.id})}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">Upload Profile Picture:</label>
+                    <input type="file" class="form-control" id="file" name="file"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+        </div>
+        <a th:href="@{/edit/{id}(id=${user.id})}" class="btn btn-secondary">Edit Profile</a>
+        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">
+            Delete Profile
+        </button>
+    </div>
+</div>
 
-    <div class="container mt-4">
-        <div th:each="post : ${posts}">
-            <article>
-                <h1 class="article-title" th:text="${post.title}">Post Title</h1>
-                <div class="d-flex align-items-center author-info mb-3">
-                    <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" class="author-photo mr-2" alt="Author Photo">
-                    <div>
-                        <span class="author-name" th:text="${post.user.username}">Author Name</span> &middot;
-                        <span class="text-muted">4 min read</span> &middot;
-                        <span class="text-muted" th:text="${#dates.format(post.createdAt, 'MMM d, yyyy')}">Date</span>
-                    </div>
-                </div>
-                <div class="article-content">
-                    <p th:text="${post.content}">Post Content</p>
-                </div>
-            </article>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete your profile? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <form th:action="@{/user/delete/{id}(id=${user.id})}" method="post">
+                    <button type="submit" class="btn btn-danger">Yes, delete</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -145,31 +174,11 @@
         });
     });
 </script>
+
 <script>
     function goBack() {
-        window.history.length > 1 ? window.history.go(-1) : window.location.href = "/";
+        window.history.length > 1? window.history.go(-1) : window.location.href = "/";
     }
 </script>
 </body>
 </html>
-
-
-<!--   <nav aria-label="Page navigation" class="mt-4">
-        <ul class="pagination">
-            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                <a class="page-link" th:href="@{'/page/' + ${currentPage - 1}}" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            <li class="page-item" th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
-                th:classappend="${pageNum == currentPage} ? 'active'">
-                <a class="page-link" th:href="@{'/page/' + ${pageNum}}" th:text="${pageNum}">1</a>
-            </li>
-            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                <a class="page-link" th:href="@{'/page/' + ${currentPage + 1}}" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
-        </nav> -->
