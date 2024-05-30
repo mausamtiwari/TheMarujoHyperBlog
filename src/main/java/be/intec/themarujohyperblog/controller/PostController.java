@@ -182,14 +182,16 @@ public class PostController {
                 if (imageSize > 10 * 1024 * 1024) {
                     logger.error("File size exceeds 10MB limit.");
                     model.addAttribute("error", "File size exceeds 10MB limit.");
-                    return "createPost"; // return to the form with error message
+                    // You may also want to return to the form with the previously entered data
+                    return "createPost";
                 }
 
                 post.setImageData(imageData);
             } catch (IOException e) {
                 logger.error("Error processing image upload: {}", e.getMessage(), e);
                 model.addAttribute("error", "Error processing image upload.");
-                return "createPost"; // return to the form with error message
+                // Return to the form with an error message
+                return "createPost";
             }
         }
 
@@ -202,13 +204,14 @@ public class PostController {
         } catch (Exception e) {
             logger.error("Error saving post: {}", e.getMessage(), e);
             model.addAttribute("error", "Error saving post.");
-            return "createPost"; // return to the form with error message
+            // Return to the form with an error message
+            return "createPost";
         }
 
-        List<BlogPost> userPosts = postService.getPostsByUser(user);
-        model.addAttribute("posts", userPosts);
-        return "redirect:/user/posts"; // redirect to the user's posts page after successful creation
+        // Redirect to the user's post list page after successful creation
+        return "redirect:/createPost";
     }
+
 
 
 
@@ -314,7 +317,7 @@ public class PostController {
     @PostMapping("/deletePost/{id}")
     public String deletePost(@PathVariable("id") Long postId) {
         postService.deletePost(postId);
-        return "redirect:/posts";
+        return "redirect:/myPosts/";
     }
 
     @PostMapping("/like")
