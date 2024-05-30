@@ -108,7 +108,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -157,7 +159,7 @@ public class PostController {
     }
 
     @PostMapping("/createPost")
-    public String createPost(@ModelAttribute("post") BlogPost post, HttpSession session, Model model) {
+    public String createPost(@ModelAttribute("post") BlogPost post, @RequestParam("image") MultipartFile imageFile, HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
             logger.warn("User session not found, redirecting to login.");
@@ -168,16 +170,48 @@ public class PostController {
             post.setDescription("No description available");
         }
 
+        if (!imageFile.isEmpty()) {
+            try {
+                byte[] imageData = imageFile.getBytes();
+
+                // Logging image size
+                long imageSize = imageData.length;
+                logger.info("Uploaded image size: {} bytes", imageSize);
+
+                // Ensure image size does not exceed 10MB
+                if (imageSize > 10 * 1024 * 1024) {
+                    logger.error("File size exceeds 10MB limit.");
+                    model.addAttribute("error", "File size exceeds 10MB limit.");
+                    return "createPost"; // return to the form with error message
+                }
+
+                post.setImageData(imageData);
+            } catch (IOException e) {
+                logger.error("Error processing image upload: {}", e.getMessage(), e);
+                model.addAttribute("error", "Error processing image upload.");
+                return "createPost"; // return to the form with error message
+            }
+        }
+
+        try {
+            logger.info("Creating post for user: {}", user.getUsername());
+            post.setCreatedAt(new Date());
+            post.setUpdatedAt(new Date());
+            post.setUser(user);
+            postService.savePost(post);
+        } catch (Exception e) {
+            logger.error("Error saving post: {}", e.getMessage(), e);
+            model.addAttribute("error", "Error saving post.");
+            return "createPost"; // return to the form with error message
+        }
 
         List<BlogPost> userPosts = postService.getPostsByUser(user);
-        logger.info("Creating post for user: {}", user.getUsername());
-        post.setCreatedAt(new Date());//JDR
-        post.setUpdatedAt(new Date());//JDR
-        post.setUser(user);
-        postService.savePost(post);
         model.addAttribute("posts", userPosts);
-        return "userposts";
+        return "redirect:/user/posts"; // redirect to the user's posts page after successful creation
     }
+
+
+
 
    /* @GetMapping("/afterlogin")
     public String afterLogin(Model model, HttpSession session, @RequestParam(value = "page", defaultValue = "1") int page) {

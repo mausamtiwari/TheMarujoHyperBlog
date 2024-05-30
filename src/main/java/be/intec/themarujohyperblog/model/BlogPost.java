@@ -17,7 +17,7 @@ public class BlogPost extends AuditModel {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = true) // description toegevoegd, anders is het moeilijk een search te doen op inhoud.
+    @Column(nullable = true)
     private String description;
 
     @Lob
@@ -34,32 +34,30 @@ public class BlogPost extends AuditModel {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
 
+    @Lob
+    @Column(name = "image_data", columnDefinition = "LONGBLOB")
+    private byte[] imageData;
+
     // Default constructor
     public BlogPost() {}
 
-    public BlogPost(Long id, String title, String description, String content) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.content = content;
-    }
-
     // Constructor with all fields
-    public BlogPost(Long id, @NotNull String title, String content, User user) {
+    public BlogPost(Long id, @NotNull String title, String description, String content, User user, byte[] imageData) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.content = content;
         this.user = user;
+        this.imageData = imageData;
     }
-
-
 
     // Constructor without id
-    public BlogPost(@NotNull String title, String content, User user) {
+    public BlogPost(@NotNull String title, String description, String content, User user, byte[] imageData) {
         this.title = title;
+        this.description = description;
         this.content = content;
         this.user = user;
+        this.imageData = imageData;
     }
 
     // Getters and Setters
@@ -79,10 +77,13 @@ public class BlogPost extends AuditModel {
         this.title = title;
     }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
-    public void setDescription(String description) { this.description = description; }
-
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getContent() {
         return content;
@@ -114,5 +115,13 @@ public class BlogPost extends AuditModel {
 
     public void setLikes(List<Like> likes) {
         this.likes = likes;
+    }
+
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
     }
 }
