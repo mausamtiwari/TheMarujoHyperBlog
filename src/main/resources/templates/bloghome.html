@@ -67,7 +67,7 @@
             </section>
 
             <!-- Create New Blog Post (only visible for the author) -->
-       <!--   <section class="create-post mt-5" th:if="${#authentication.name == user.username}">-->
+        <section class="create-post mt-5" th:if="${#authentication.name == user.username}">
                 <h2>Create New Blog Post</h2>
                 <!-- Form for creating new post -->
                 <form action="/createPost" method="post">

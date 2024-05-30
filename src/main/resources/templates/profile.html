@@ -167,8 +167,11 @@
                 <div class="mt-3">
                     <!-- "Create New Blog Post" Option -->
                     <div class="text-center mt-4">
-                        <a href="/createPost" class="btn btn-primary">Create New Blog Post</a>
+                        <form action="/createPost" method="post">
+                            <button type="submit" class="btn btn-primary">Create New Blog Post</button>
+                        </form>
                     </div>
+
                     <!-- Display all blog posts of the user -->
                     <div class="mt-4">
                         <h2>All Blog Posts</h2>
