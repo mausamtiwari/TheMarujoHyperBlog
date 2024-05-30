@@ -158,7 +158,7 @@ public class PostController {
         return "createpost";
     }
 
-    @PostMapping("/createPost")
+   /* @PostMapping("/createPost")
     public String createPost(@ModelAttribute("post") BlogPost post, @RequestParam("image") MultipartFile imageFile, HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
@@ -183,7 +183,7 @@ public class PostController {
                     logger.error("File size exceeds 10MB limit.");
                     model.addAttribute("error", "File size exceeds 10MB limit.");
                     // You may also want to return to the form with the previously entered data
-                    return "createPost";
+                    return "createpost";
                 }
 
                 post.setImageData(imageData);
@@ -191,7 +191,7 @@ public class PostController {
                 logger.error("Error processing image upload: {}", e.getMessage(), e);
                 model.addAttribute("error", "Error processing image upload.");
                 // Return to the form with an error message
-                return "createPost";
+                return "createpost";
             }
         }
 
@@ -205,14 +205,35 @@ public class PostController {
             logger.error("Error saving post: {}", e.getMessage(), e);
             model.addAttribute("error", "Error saving post.");
             // Return to the form with an error message
-            return "createPost";
+            return "createpost";
         }
 
         // Redirect to the user's post list page after successful creation
-        return "redirect:/createPost";
+        return "posts";
+    }*/
+
+    @PostMapping("/createPost")
+    public String createPost(@ModelAttribute("post") BlogPost post, HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            logger.warn("User session not found, redirecting to login.");
+            return "redirect:/login";
+        }
+
+        if (post.getDescription() == null || post.getDescription().trim().isEmpty()) {
+            post.setDescription("No description available");
+        }
+
+
+        List<BlogPost> userPosts = postService.getPostsByUser(user);
+        logger.info("Creating post for user: {}", user.getUsername());
+        post.setCreatedAt(new Date());//JDR
+        post.setUpdatedAt(new Date());//JDR
+        post.setUser(user);
+        postService.savePost(post);
+        model.addAttribute("posts", userPosts);
+        return "createPost";
     }
-
-
 
 
 

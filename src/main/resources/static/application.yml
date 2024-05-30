@@ -14,6 +14,13 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+      spring:
+        web:
+          cors:
+            allowed-origins: http://example.com
+            allowed-methods: "*"
+            allowed-headers: "*"
+            allow-credentials: true
   security:
     oauth2:
       client:
