@@ -64,20 +64,25 @@
             <div class="post-card p-3 mb-3 border rounded shadow-sm">
                 <h3>Comments</h3>
                 <!-- Content of the comment -->
-                   <div th:each="comment : ${post.comments}" class="comment-card p-3 mb-3 border rounded shadow-sm">
-                    <p th:text="${comment.content}"></p>
+                   <div th:each="comment : ${commentList}" class="comment-card p-3 mb-3 border rounded shadow-sm">
+                    <p th:text="${comment.getText()}"></p>
                     <!-- Display the author of the comment -->
-                    <p class="text-muted text-right">Comment by: <span th:text="${comment.getUser().getUsername()}"></span></p>
+                    <p class="text-muted text-right">Comment by: <span th:text="${comment.user.username}"></span></p>
                     <p class="text-muted text-right"> Added on: <span th:text="${#dates.format(comment.updatedAt, 'dd-MM-yyyy HH:mm')}"></span></p>
-
-
-                </div>
+                    </div>
 
                 <!-- Buttons to edit, delete, and view comments for the post -->
 
                 <div class="mt-3">
                     <!-- <a class="btn btn-primary" th:href="@{'/createPost/' + ${post.id}}">Create</a> -->
-                    <a class="btn btn-primary" th:href="@{'/blog_post/'+ ${post.id}+'/blog_comment'}">Add Comment</a>
+                    <div>
+                        <h3>Add a Comment</h3>
+                        <form th:action="@{/blog_post/{blogpostId}/blog_comment(blogpostId=${post.id})}" th:object="${newComment}" method="post">
+                            <textarea th:field="*{text}" placeholder="Write your comment here"></textarea>
+
+                            <button type="submit">Submit</button>
+                        </form>
+                    </div>
 
                     <a class="btn btn-primary" th:href="@{'/updatePost/' + ${post.id}}">Edit</a>
                     <a class="btn btn-danger" th:href="@{'/deletePost/' + ${post.id}}">Delete</a>
@@ -137,7 +142,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <ul class="list-unstyled mb-0">
-                                    <li><a href="#!">Who is logged in?</a></li>
+                                    <li>You are logged in as: httpSession.getAttribute('username')</li>
                                     <li><a href="#!">Number of visitors</a></li>
                                     <li><a href="#!">You are the nth visitor</a></li>
                                 </ul>

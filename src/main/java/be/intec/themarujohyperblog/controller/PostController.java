@@ -94,6 +94,7 @@ public class PostController {
 
 package be.intec.themarujohyperblog.controller;
 
+import be.intec.themarujohyperblog.model.BlogComment;
 import be.intec.themarujohyperblog.model.Like;
 import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.model.User;
@@ -103,8 +104,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -120,12 +119,14 @@ public class PostController {
     private final UserServiceImpl userService;
     private final LikeServiceImpl likeService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private final CommentServiceImpl commentServiceImpl;
 
     @Autowired
-    public PostController(PostServiceImpl postService, UserServiceImpl userService, LikeServiceImpl likeService) {
+    public PostController(PostServiceImpl postService, UserServiceImpl userService, CommentServiceImpl commentService, LikeServiceImpl likeService, CommentServiceImpl commentServiceImpl) {
         this.postService = postService;
         this.userService = userService;
         this.likeService = likeService;
+        this.commentServiceImpl = commentServiceImpl;
     }
 
     @GetMapping("/")  //root, eerste pagina
@@ -175,6 +176,7 @@ public class PostController {
         post.setUpdatedAt(new Date());//JDR
         post.setUser(user);
         postService.savePost(post);
+        //System.out.println("Post created: " + post); //reden voor dubbele post creatie is 'resubmit form' in de browser om te refreshen.
         model.addAttribute("posts", userPosts);
         return "userposts";
     }
@@ -308,12 +310,37 @@ public class PostController {
     }
 
     //method om individuele post te bekijken
-    @PostMapping("/viewPost/{id}")
-    public String viewPost(@PathVariable("id") Long id, Model model) {
+    @GetMapping("/viewPost/{id}")
+    public String viewPost(@PathVariable("id") Long id, Model model, HttpSession session) {
         BlogPost post = postService.getPostById(id);
         model.addAttribute("post", post);
+
+        //add all comments to the model of the post
+        model.addAttribute("commentList", post.getComments());
+        model.addAttribute("newComment", new BlogComment());
+
         return "blogpostdetail";
     }
+
+    // methode om nieuwe comment toe te voegen aan een post
+    @PostMapping("/blog_post/{blogpostId}/blog_comment")
+    public String createComment(@PathVariable(value = "blogpostId") Long postId,
+                                HttpSession session, Model model,
+                                @ModelAttribute("commentText") BlogComment newComment) {
+        BlogPost post = postService.getPostById(postId);
+
+        //User met post verbinden, of anders met anonymous
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            user = userService.findByUserName("anonymous").orElseThrow(() -> new IllegalArgumentException("Invalid username"));
+        }
+        newComment.setUser(user);
+        newComment.setPost(post);
+
+        commentServiceImpl.saveComment(newComment);
+        return "redirect:/viewPost/" + postId;
+    }
+
 
 
 }
