@@ -15,6 +15,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -58,7 +60,25 @@ public class UserServiceImpl implements UserService {
             }
             userRepository.save(user);
         }
+        // Add a user with userName="anonymous" to the database
+
+        Optional<User> anonymousUserOptional = userRepository.findByUsername("anonymous");
+        if (anonymousUserOptional.isEmpty()) {
+            User anonymousUser = new User();
+            anonymousUser.setEnabled(false);
+            anonymousUser.setFirstName("anonymous");
+            anonymousUser.setLastName("anonymous");
+            anonymousUser.setUsername("anonymous");
+            anonymousUser.setPassword("Anonymous@123");
+            anonymousUser.setEmail("anonymous@yahoo.com");
+
+            userRepository.save(anonymousUser);
+        }
+
     }
+
+
+
 
     @Override
     public void deleteUser(Long userId) {
@@ -93,6 +113,13 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findByUserNameAndPassword(String username, String password) {
         return userRepository.findByUsernameAndPassword(username, password);
     }
+
+
+
+
+
+
+
 
    /* @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
