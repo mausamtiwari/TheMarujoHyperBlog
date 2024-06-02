@@ -31,6 +31,9 @@ public class BlogPost extends AuditModel {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
 
+    @Column(name = "post_photo")
+    private String postPhoto;
+
     // Default constructor
     public BlogPost() {}
 
@@ -96,5 +99,13 @@ public class BlogPost extends AuditModel {
 
     public void setLikes(List<Like> likes) {
         this.likes = likes;
+    }
+
+    public String getPostPhoto() {
+        return postPhoto;
+    }
+
+    public void setPostPhoto(String postPhoto) {
+        this.postPhoto = postPhoto;
     }
 }
