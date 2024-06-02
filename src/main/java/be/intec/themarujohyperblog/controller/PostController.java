@@ -111,6 +111,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 
 @Controller
 public class PostController {
@@ -309,14 +311,24 @@ public class PostController {
         return "blogcentral";
     }
 
-    //method om individuele post te bekijken
+    //method om individuele post te bekijken en de bijhorende comments in de vorm van pageable list en findCommentPaginated
     @GetMapping("/viewPost/{id}")
-    public String viewPost(@PathVariable("id") Long id, Model model, HttpSession session) {
+    public String viewPost(@PathVariable("id") Long id,
+                           @RequestParam(name = "page", defaultValue = "1") int pageNo,
+                           Model model, HttpSession session) {
         BlogPost post = postService.getPostById(id);
         model.addAttribute("post", post);
 
-        //add all comments to the model of the post
-        model.addAttribute("commentList", post.getComments());
+        // Alle comments toevoegen aan het model als pageable
+        int pageSize = 5; // Set the number of comments per page
+        Page<BlogComment> page = commentServiceImpl.findCommentPaginated(id, pageNo, pageSize);
+        List<BlogComment> commentList = page.getContent();
+
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("totalItems", page.getTotalElements());
+        model.addAttribute("commentList", commentList);
+
         model.addAttribute("newComment", new BlogComment());
 
         return "blogpostdetail";

@@ -95,23 +95,23 @@
                         <nav aria-label="Page navigation">
                             <ul class="pagination justify-content-center">
                                 <li class="page-item">
-                                    <a th:if="${currentPage > 1}" class="page-link" th:href="@{'/page/' + ${1}}">First</a>
+                                    <a th:if="${currentPage > 1}" class="page-link" th:href="@{'/viewPost/' + ${post.id} + '?page=' + ${1}}">First</a>
                                 </li>
                                 <li class="page-item">
-                                    <a th:if="${currentPage > 1}" class="page-link" th:href="@{'/page/' + ${currentPage - 1}}">Previous</a>
+                                    <a th:if="${currentPage > 1}" class="page-link" th:href="@{'/viewPost/' + ${post.id} + '?page=' + ${currentPage - 1}}">Previous</a>
                                 </li>
                                 <li th:each="i:${#numbers.sequence(1, totalPages)}" class="page-item"
                                     th:classappend="${currentPage == i} ? 'active' : ''">
-                                    <a class="page-link" th:if="${currentPage != i}" th:href="@{'/page/' + ${i}}"
+                                    <a class="page-link" th:if="${currentPage != i}" th:href="@{'/viewPost/' + ${post.id} + '?page=' + ${i}}"
                                        th:text="${i}"></a>
                                     <span class="page-link" th:unless="${currentPage != i}" th:text="${i}"></span>
                                 </li>
                                 <li class="page-item">
                                     <a th:if="${currentPage < totalPages}" class="page-link"
-                                       th:href="@{'/page/' + ${currentPage + 1}}">Next</a>
+                                       th:href="@{'/viewPost/' + ${post.id} + '?page=' + ${currentPage + 1}}">Next</a>
                                 </li>
                                 <li class="page-item">
-                                    <a th:if="${currentPage < totalPages}" class="page-link" th:href="@{'/page/' + ${totalPages}}">Last</a>
+                                    <a th:if="${currentPage < totalPages}" class="page-link" th:href="@{'/viewPost/' + ${post.id} + '?page=' + ${totalPages}}">Last</a>
                                 </li>
                             </ul>
                         </nav>
