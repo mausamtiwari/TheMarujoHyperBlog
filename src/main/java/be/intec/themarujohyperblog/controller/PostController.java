@@ -325,7 +325,25 @@ public class PostController {
         }
         return "redirect:/myPosts";
 
+    }
 
+    //delete blogpost comment for a specific postid and check the identity of the logged user
+    @PostMapping("/deleteComment/{postId}/{commentId}")
+    public String deleteComment(@PathVariable("commentId") Long postId, Long commentId,  HttpSession session) {
+        //get session identity
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/notAuthorised";
+        };
+        BlogComment comment = commentServiceImpl.getCommentById(commentId);
+        //check if the comment belongs to the user:
+        if (!Objects.equals(comment.getUser().getId(), user.getId())) {
+            //niet geauthoriseerd: comment behoort niet tot de user
+            return "redirect:/notAuthorised";
+        } else {
+            commentServiceImpl.deleteCommentById(commentId);
+        }
+        return "redirect:/viewPost/{postId)}";
     }
 
     @PostMapping("/like")

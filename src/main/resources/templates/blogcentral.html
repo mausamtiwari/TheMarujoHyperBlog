@@ -35,6 +35,7 @@
 <header class="py-0 bg-light border-bottom mb-4">
     <div class="container">
         <div class="text-center my-5">
+
             <h2 class="fw-bolder">Welcome to the Marujo HyperBlog</h2>
             <p class="lead mb-0">Below is a list of the most recent posts.</p>
         </div>
@@ -137,12 +138,20 @@
 <!-- Footer-->
 <footer class="py-5 bg-dark">
     <div class="container">
-        <!-- Show MarujoLogo2.jpg from assets folder-->
-        <div class="text-center">
-            <img src="/templates/assets/MarujoLogo2.jpg" alt="Marujo Logo">
+        <!-- Display  MarujoLogo2.jpg from assets folder-->
+        <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/assets/MarujoLogo2small.png}" alt="Marujo Logo" /></div>
+
+
+
+        <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
+        </div>
+        <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/assets/MarujoLogo2small.png}" alt="Marujo Logo" /></div>
+
+
+
+        <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
         </div>
 
-        <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p></div>
 
 </footer>
 <!-- Bootstrap core JS-->
