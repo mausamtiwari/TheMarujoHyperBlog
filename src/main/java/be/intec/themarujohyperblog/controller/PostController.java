@@ -307,8 +307,10 @@ public class PostController {
         return "redirect:/viewPost/{postId}";
     }
 
+    //delete post and check the identity of the logged user
     @PostMapping("/deletePost/{id}")
     public String deletePost(@PathVariable("id") Long postId) {
+        //get session identity
         postService.deletePost(postId);
         return "redirect:/posts";
     }
