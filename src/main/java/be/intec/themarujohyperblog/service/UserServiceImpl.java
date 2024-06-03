@@ -18,14 +18,15 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    //private final BCryptPasswordEncoder passwordEncoder;
+
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    public UserServiceImpl(@Lazy UserRepository userRepository, @Lazy BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = new BCryptPasswordEncoder();
+        //this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -35,19 +36,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void registerUser(User user) {
-        String rawPassword = user.getPassword();
+       /* String rawPassword = user.getPassword();
         String encodedPassword = passwordEncoder.encode(rawPassword);
         logger.debug("Raw password during registration: {}", rawPassword);
         logger.debug("Encoded password during registration: {}", encodedPassword);
-        user.setPassword(encodedPassword);
-        user.setEnabled(true); // Ensure the 'enabled' field is set to true
+        user.setPassword(encodedPassword);*/
+        user.setEnabled(true);
         userRepository.save(user);
     }
 
 
     @Override
     public User save(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Validated(User.UpdateGroup.class)
     public void updateUser(@Validated(User.UpdateGroup.class) User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        //user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 

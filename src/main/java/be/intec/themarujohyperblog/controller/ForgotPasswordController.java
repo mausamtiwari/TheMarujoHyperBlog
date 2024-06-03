@@ -9,6 +9,8 @@ import jakarta.mail.MessagingException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,14 +27,17 @@ public class ForgotPasswordController {
     private final ForgotPasswordService forgotPasswordService;
     private final ForgotPasswordRepository forgotPasswordRepository;
 
-    private final BCryptPasswordEncoder passwordEncoder;
+   // private final BCryptPasswordEncoder passwordEncoder;
+
+
+
 
     @Autowired
-    public ForgotPasswordController(UserService userService, ForgotPasswordService forgotPasswordService, ForgotPasswordRepository forgotPasswordRepository, BCryptPasswordEncoder passwordEncoder) {
+    public ForgotPasswordController(UserService userService, ForgotPasswordService forgotPasswordService, ForgotPasswordRepository forgotPasswordRepository) {
         this.userService = userService;
         this.forgotPasswordService = forgotPasswordService;
         this.forgotPasswordRepository = forgotPasswordRepository;
-        this.passwordEncoder = passwordEncoder;
+        //this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/password-request")
@@ -104,7 +109,8 @@ public class ForgotPasswordController {
 
         try {
             User user = forgotPasswordToken.getUser();
-            user.setPassword(passwordEncoder.encode(password));
+            user.setPassword(password);
+           // user.setPassword(passwordEncoder.encode(password));
             userService.updateUser(user);
 
             forgotPasswordToken.setUsed(true);

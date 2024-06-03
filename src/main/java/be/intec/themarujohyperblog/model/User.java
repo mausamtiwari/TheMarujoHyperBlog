@@ -35,11 +35,11 @@ public class User {
     private String username;
 
     @NotBlank(message = "Password is required", groups = {CreateGroup.class})
-    /*@Pattern(
+    @Pattern(
             regexp = "^(?=.*[A-Z])(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{1,10}$",
             message = "Password must contain at least one capital letter, one special character, letters, and numbers, and must be a maximum of 10 characters long.",
             groups = {CreateGroup.class, UpdateGroup.class}
-    )*/
+    )
     @Column(length = 60)
     private String password;
 

@@ -9,7 +9,10 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -31,15 +35,16 @@ public class UserController {
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    private final BCryptPasswordEncoder passwordEncoder;
+    //private final BCryptPasswordEncoder passwordEncoder;
+
 
     private final UserServiceImpl userService;
     private final PostServiceImpl postService;
 
 
     @Autowired
-    public UserController(BCryptPasswordEncoder passwordEncoder, UserServiceImpl userService, PostServiceImpl postService) {
-        this.passwordEncoder = passwordEncoder;
+    public UserController(UserServiceImpl userService, PostServiceImpl postService) {
+        //this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.postService = postService;
     }
@@ -54,7 +59,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
+    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
         logger.info("Registering user: {}", user);
 
         String validationResult = validateUser(user, result, model);
@@ -67,10 +72,11 @@ public class UserController {
             return "register";
         }
 
-        // Encode the password before saving the user
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        logger.debug("Encoded password during registration: {}", encodedPassword);
-        user.setPassword(encodedPassword);
+       /* // Encode the password before saving the user
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        logger.debug("Raw password during registration: {}", user.getPassword());
+        logger.debug("Encoded password during registration: {}", hashedPassword);
+        user.setPassword(hashedPassword);*/
 
         // Register user if all checks pass
         userService.registerUser(user);
@@ -99,34 +105,35 @@ public class UserController {
             return "login";
         }
         User user = userOptional.get();
-        logger.debug("Raw password: {}", password);
+        /*logger.debug("Raw password: {}", password);
         logger.debug("Encoded password from DB: {}", user.getPassword());
         boolean passwordMatches = passwordEncoder.matches(password, user.getPassword());
         logger.debug("Password matches: {}", passwordMatches);
+*/
+        //if (passwordEncoder.matches(password, user.getPassword())) {
+        if (password.equals(user.getPassword())) {
+            logger.info("{} logged in successfully", username);
+            session.setAttribute("username", username);
+            session.setAttribute("loggedInUser", user);
+            model.addAttribute("user", user);
+            List<BlogPost> posts = postService.getAllPosts();
+            model.addAttribute("posts", posts);
 
-        if (!passwordMatches) {
-            logger.warn("Invalid login credentials for username: {}", username);
-            model.addAttribute("error", "Invalid username or password");
-            model.addAttribute("user", new User());
-            return "login";
+            return "afterlogin";
         }
+        logger.warn("Invalid login credentials for username: {}", username);
+        model.addAttribute("error", "Invalid username or password");
+        model.addAttribute("user", new User());
+        return "login";
 
-        logger.info("{} logged in successfully", username);
-        session.setAttribute("username", username);
-        session.setAttribute("loggedInUser", user);
-        model.addAttribute("user", user);
-        List<BlogPost> posts = postService.getAllPosts();
-        model.addAttribute("posts", posts);
-
-        return "afterlogin";
     }
 
 
-  /*  @GetMapping("/user")
+    @GetMapping("/user")
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
         return principal.getAttributes();
     }
-*/
+
 
     @GetMapping("/profile/{id}")
     public String viewUserProfile(@PathVariable("id") Long id, Model model) {
@@ -150,8 +157,6 @@ public class UserController {
         model.addAttribute("user", optionalUser.get());
         return "edit-profile";
     }
-
-
 
 
     @PostMapping("/edit/{id}")
@@ -188,8 +193,10 @@ public class UserController {
         existingUser.setFirstName(user.getFirstName());
         existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());
-        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        existingUser.setConfirmPassword(passwordEncoder.encode(user.getConfirmPassword()));
+        //existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        //existingUser.setConfirmPassword(passwordEncoder.encode(user.getConfirmPassword()));
+        existingUser.setPassword(user.getPassword());
+        existingUser.setConfirmPassword(user.getConfirmPassword());
         logger.info("User profile updated: {}", user);
 
         userService.updateUser(existingUser);
