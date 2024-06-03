@@ -104,6 +104,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -112,7 +113,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -232,7 +235,7 @@ public class PostController {
         post.setUser(user);
         postService.savePost(post);
         model.addAttribute("posts", userPosts);
-        return "createPost";
+        return "afterlogin";
     }
 
 
@@ -351,6 +354,15 @@ public class PostController {
     @ResponseBody
     public void unlikePost(@PathVariable("id") Long id) {
         likeService.deleteLike(id);
+    }
+    //get mapping to retrieve the number of posts and number of users in the database
+
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Long>> getStats() {
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("postCount", postService.countPosts());
+        stats.put("userCount", userService.countUsers());
+        return ResponseEntity.ok(stats);
     }
 
     @GetMapping("/page/{pageNo}")

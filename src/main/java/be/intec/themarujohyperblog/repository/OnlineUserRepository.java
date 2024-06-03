@@ -1,7 +1,6 @@
 package be.intec.themarujohyperblog.repository;
 
 import be.intec.themarujohyperblog.model.OnlineUser;
-import be.intec.themarujohyperblog.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -105,23 +105,19 @@
     </header>
 
     <h2>Create a New Post</h2>
-    <form th:action="@{/createPost}" th:object="${post}" method="post" enctype="multipart/form-data">
+    <form th:action="@{/createPost}" th:object="${post}" method="post">
         <div class="mb-3">
             <label for="title" class="form-label">Title:</label>
             <input type="text" class="form-control" id="title" th:field="*{title}" placeholder="Enter title">
         </div>
         <div class="mb-3">
-            <label for="description" class="form-label">Description:</label>
+            <label for="title" class="form-label">Description:</label>
             <input type="text" class="form-control" id="description" th:field="*{description}" placeholder="Please give a short description">
+
         </div>
         <div class="mb-3">
             <label for="content" class="form-label">Content:</label>
             <textarea class="form-control" id="content" th:field="*{content}" placeholder="Enter content"></textarea>
-        </div>
-        <!-- File upload input field -->
-        <div class="mb-3">
-            <label for="image" class="form-label">Image:</label>
-            <input type="file" class="form-control" id="image" name="image">
         </div>
         <button type="submit" class="btn btn-primary">Create Post</button>
     </form>

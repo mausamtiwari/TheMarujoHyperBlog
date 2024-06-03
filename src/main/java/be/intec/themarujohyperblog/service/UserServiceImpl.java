@@ -3,8 +3,6 @@ package be.intec.themarujohyperblog.service;
 import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -92,6 +90,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByUserNameAndPassword(String username, String password) {
         return userRepository.findByUsernameAndPassword(username, password);
+    }
+
+    public long countUsers() {
+        return (int) userRepository.count();
     }
 
    /* @Override
