@@ -369,10 +369,7 @@ public class PostController {
             posts.sort(Comparator.comparing(BlogPost::getDate).reversed());
         } else if (sortBy.equals("oldest")) {
             posts.sort(Comparator.comparing(BlogPost::getDate));
-        } else if (sortBy.equals("popularity")) {
-            posts.sort(Comparator.comparing(BlogPost::getPopularity).reversed());
         }
-
         return posts;
     }
 
