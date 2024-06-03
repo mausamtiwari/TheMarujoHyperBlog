@@ -57,7 +57,52 @@
                         th:text="${#dates.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span></p> <!-- If the post was updated, display the updated date -->
                 <p class="text"> Content: <span th:text="${post.content}"></span>
                 </p>
+            <!-- Buttons to edit post, delete post using @GetMapping("/updatePost/{id}" and @PostMapping("/updatePost/{id}")-->
+            <div class="mt-3">
+               <!-- goes to page show form with the current post, and a submit button-->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editPostModal">
+                    Edit Post
+                </button>
+                <a class="btn btn-danger" th:href="@{'/deletePost/' + ${post.id}}">Delete</a>
+            </div>
+            </div>
+            <!-- The Modal -->
+            <div class="modal" id="editPostModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
 
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Edit Post</h4>
+                            <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <form th:action="@{/saveUpdatedPost/{id}(id=${post.id})}" th:object="${post}" method="post">
+                                <div class="form-group">
+                                    <label for="title">Title:</label>
+                                    <input type="text" class="form-control" id="title" th:field="*{title}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">Description:</label>
+                                    <input type="text" class="form-control" id="description" th:field="*{description}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="content">Content:</label>
+                                    <textarea class="form-control" id="content" th:field="*{content}"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+                </div>
             </div>
 
             <!-- Display all the comments -->
