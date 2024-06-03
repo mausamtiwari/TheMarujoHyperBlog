@@ -60,18 +60,18 @@ public class UserServiceImpl implements UserService {
             }
             userRepository.save(user);
         }
-        // Add a user with userName="anonymous" to the database
+        // JDR: Add a user with userName="anonymous" to the database if does not already exist
 
         Optional<User> anonymousUserOptional = userRepository.findByUsername("anonymous");
         if (anonymousUserOptional.isEmpty()) {
             User anonymousUser = new User();
-            anonymousUser.setEnabled(false);
+            //moved setEnabled(true) to the end of the block
             anonymousUser.setFirstName("anonymous");
             anonymousUser.setLastName("anonymous");
             anonymousUser.setUsername("anonymous");
-            anonymousUser.setPassword("Anonymous@123");
+            anonymousUser.setPassword("Anon@123");
             anonymousUser.setEmail("anonymous@yahoo.com");
-
+            anonymousUser.setEnabled(true); // JDR: error message for validation, changing false to true: is this the solution???
             userRepository.save(anonymousUser);
         }
 
@@ -112,6 +112,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByUserNameAndPassword(String username, String password) {
         return userRepository.findByUsernameAndPassword(username, password);
+    }
+
+    public int countUsers() {
+        return (int) userRepository.count();
     }
 
 

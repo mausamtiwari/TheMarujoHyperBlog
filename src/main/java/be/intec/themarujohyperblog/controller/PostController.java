@@ -110,8 +110,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+import static org.springframework.util.ClassUtils.isPresent;
 
 
 @Controller
@@ -267,24 +269,81 @@ public class PostController {
         postService.savePost(post);
         return "afterlogin";
     }*/
-    @GetMapping("/updatePost/{id}")
-    public String showUpdatePostForm(@PathVariable("id") Long postId, Model model) {
+
+    @GetMapping("/updatePost/{postId}")
+    public String showUpdatePostForm(@PathVariable("postId") Long postId, Model model, HttpSession session) {
+        //check that the post belongs to the user
+
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
         BlogPost post = postService.getPostById(postId);
+        if (!Objects.equals(post.getUser().getId(), user.getId())) {
+            //niet geauthoriseerd: post behoort niet tot de user
+            return "redirect:/notAuthorised";
+        }
+        System.out.println("user:"+ user);
+        System.out.println("post user:"+ post.getUser());
+
+
+
         model.addAttribute("post", post);
-        return "editPost";
+        return "redirect:/saveUpdatedPost/{postId}";
     }
 
-    @PostMapping("/updatePost/{id}")
-    public String updatePost(@PathVariable("id") Long id, @ModelAttribute("post") BlogPost post) {
-        post.setId(id);
-        postService.savePost(post);
-        return "redirect:/myPosts" + id;
+
+    @PostMapping("/saveUpdatedPost/{postId}")
+    public String updatePost(@PathVariable("postId") Long postId, @ModelAttribute("post") BlogPost post) {
+
+        BlogPost existingPost = postService.getPostById(postId);
+
+        existingPost.setTitle(post.getTitle());
+        existingPost.setDescription(post.getDescription());
+        existingPost.setContent(post.getContent());
+        //existingPost.setComments(post.getComments());
+        existingPost.setUpdatedAt(new Date());
+        postService.savePost(existingPost);
+        return "redirect:/viewPost/{postId}";
     }
 
+    //delete post and check the identity of the logged user
     @PostMapping("/deletePost/{id}")
-    public String deletePost(@PathVariable("id") Long postId) {
-        postService.deletePost(postId);
-        return "redirect:/posts";
+    public String deletePost(@PathVariable("id") Long postId, HttpSession session) {
+        //get session identity
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/notAuthorised";
+        };
+        BlogPost post = postService.getPostById(postId);
+        //check if the post belongs to the user:
+        if (!Objects.equals(post.getUser().getId(), user.getId())) {
+            //niet geauthoriseerd: post behoort niet tot de user
+            return "redirect:/notAuthorised";
+        } else {
+            postService.deletePost(postId);
+        }
+        return "redirect:/myPosts";
+
+    }
+
+    //delete blogpost comment for a specific postid and check the identity of the logged user
+    @PostMapping("/deleteComment/{postId}/{commentId}")
+    public String deleteComment(@PathVariable("commentId") Long postId, Long commentId,  HttpSession session) {
+        //get session identity
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/notAuthorised";
+        };
+        BlogComment comment = commentServiceImpl.getCommentById(commentId);
+        //check if the comment belongs to the user:
+        if (!Objects.equals(comment.getUser().getId(), user.getId())) {
+            //niet geauthoriseerd: comment behoort niet tot de user
+            return "redirect:/notAuthorised";
+        } else {
+            commentServiceImpl.deleteCommentById(commentId);
+        }
+        return "redirect:/viewPost/{postId)}";
     }
 
     @PostMapping("/like")
@@ -301,6 +360,8 @@ public class PostController {
 
     @GetMapping("/page/{pageNo}")
     public String findPostPaginated(@PathVariable(value = "pageNo") int pageNo, Model model) {
+
+
         int pageSize = 6; //aantal posts op één pagina is 6;
         Page<BlogPost> page = postService.findPostPaginated(pageNo, pageSize);
         List<BlogPost> postList = page.getContent(); //komt van springframework.data.domain.Page
@@ -353,6 +414,20 @@ public class PostController {
         return "redirect:/viewPost/" + postId;
     }
 
+    //get mapping to retrieve the number of posts and number of users in the database
+    @GetMapping("/stats")
+    public String getStats(Model model) {
+        long postCount = postService.countPosts();
+        long userCount = userService.countUsers();
+        model.addAttribute("postCount", postCount);
+        model.addAttribute("userCount", userCount);
+        return "stats";
+    }
+
+    @GetMapping("/notAuthorised")
+    public String notAuthorised() {
+        return "notauthorised";
+    }
 
 
 }

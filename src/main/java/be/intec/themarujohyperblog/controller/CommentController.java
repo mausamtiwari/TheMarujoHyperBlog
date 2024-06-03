@@ -79,11 +79,14 @@ public class CommentController {
     }
 
     // Handles GET requests for deleting a specific comment
+    //JDR: this will be handled in the post controller
+    /*
     @GetMapping("/blog_post/{blogpostId}/blog_comment/{blogcommentId}/delete")
     public String deleteComment(@PathVariable(value = "blogpostId") Long postId,
                                 @PathVariable(value = "blogcommentId") Long commentId) {
         commentService.deleteCommentById(commentId);
         return "redirect:/blog_post/" + postId + "/blog_comment";
     }
+    */
 
 }
