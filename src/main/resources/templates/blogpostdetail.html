@@ -63,7 +63,10 @@
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editPostModal">
                     Edit Post
                 </button>
-                <a class="btn btn-danger" th:href="@{'/deletePost/' + ${post.id}}">Delete</a>
+                <form th:action="@{'/deletePost/' + ${post.getId()}}" method="post">
+                    <input type="submit" value="Delete" class="btn btn-danger"/>
+                </form>
+
             </div>
             </div>
             <!-- The Modal -->

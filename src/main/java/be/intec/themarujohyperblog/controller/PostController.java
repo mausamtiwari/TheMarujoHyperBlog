@@ -309,10 +309,23 @@ public class PostController {
 
     //delete post and check the identity of the logged user
     @PostMapping("/deletePost/{id}")
-    public String deletePost(@PathVariable("id") Long postId) {
+    public String deletePost(@PathVariable("id") Long postId, HttpSession session) {
         //get session identity
-        postService.deletePost(postId);
-        return "redirect:/posts";
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/notAuthorised";
+        };
+        BlogPost post = postService.getPostById(postId);
+        //check if the post belongs to the user:
+        if (!Objects.equals(post.getUser().getId(), user.getId())) {
+            //niet geauthoriseerd: post behoort niet tot de user
+            return "redirect:/notAuthorised";
+        } else {
+            postService.deletePost(postId);
+        }
+        return "redirect:/myPosts";
+
+
     }
 
     @PostMapping("/like")
