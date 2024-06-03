@@ -112,10 +112,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Controller
@@ -363,6 +360,20 @@ public class PostController {
         stats.put("postCount", postService.countPosts());
         stats.put("userCount", userService.countUsers());
         return ResponseEntity.ok(stats);
+    }
+    @GetMapping("/posts")
+    public List<BlogPost> getPosts(@RequestParam String sortBy) {
+        List<BlogPost> posts = postService.getAllPosts();
+
+        if (sortBy.equals("recent")) {
+            posts.sort(Comparator.comparing(BlogPost::getDate).reversed());
+        } else if (sortBy.equals("oldest")) {
+            posts.sort(Comparator.comparing(BlogPost::getDate));
+        } else if (sortBy.equals("popularity")) {
+            posts.sort(Comparator.comparing(BlogPost::getPopularity).reversed());
+        }
+
+        return posts;
     }
 
     @GetMapping("/page/{pageNo}")

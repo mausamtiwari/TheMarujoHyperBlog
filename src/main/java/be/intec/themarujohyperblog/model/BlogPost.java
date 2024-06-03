@@ -3,6 +3,7 @@ package be.intec.themarujohyperblog.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -37,27 +38,30 @@ public class BlogPost extends AuditModel {
     @Lob
     @Column(name = "image_data", columnDefinition = "LONGBLOB")
     private byte[] imageData;
-
+    @Column(nullable = true)
+    private LocalDateTime date;
     // Default constructor
     public BlogPost() {}
 
     // Constructor with all fields
-    public BlogPost(Long id, @NotNull String title, String description, String content, User user, byte[] imageData) {
+    public BlogPost(Long id, @NotNull String title, String description, String content, User user, byte[] imageData, LocalDateTime date) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.content = content;
         this.user = user;
         this.imageData = imageData;
+        this.date = date;
     }
 
     // Constructor without id
-    public BlogPost(@NotNull String title, String description, String content, User user, byte[] imageData) {
+    public BlogPost(@NotNull String title, String description, String content, User user, byte[] imageData, LocalDateTime date) {
         this.title = title;
         this.description = description;
         this.content = content;
         this.user = user;
         this.imageData = imageData;
+        this.date = date;
     }
 
     // Getters and Setters
@@ -117,6 +121,14 @@ public class BlogPost extends AuditModel {
         this.likes = likes;
     }
 
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
+
     public byte[] getImageData() {
         return imageData;
     }
@@ -124,4 +136,10 @@ public class BlogPost extends AuditModel {
     public void setImageData(byte[] imageData) {
         this.imageData = imageData;
     }
+
+    public int getPopularity() {
+        return likes != null ? likes.size() : 0;
+    }
+
 }
+
