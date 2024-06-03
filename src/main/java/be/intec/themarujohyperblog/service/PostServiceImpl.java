@@ -10,6 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +56,11 @@ public class PostServiceImpl implements PostService{
     @Override
     public void savePost(BlogPost post) {
         postRepository.save(post);
+    }
+
+    public void saveImage(byte[] imageBytes, String imagePath) throws IOException {
+        Path path = Paths.get(imagePath);
+        Files.write(path, imageBytes);
     }
 
     @Override
@@ -98,6 +107,12 @@ public class PostServiceImpl implements PostService{
     @Override
     public Page<BlogPost> searchPostDescription(String search) {
         return postRepository.findByDescriptionContaining(search, PageRequest.of(0, 6));
+
+    }
+
+
+    public int countPosts() {
+        return (int) postRepository.count();
     }
 
     //missing?

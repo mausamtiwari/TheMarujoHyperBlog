@@ -98,8 +98,8 @@
         <div class="dropdown">
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="userDropdown"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" alt="User Profile" width="30" height="30"
-                     class="rounded-circle mr-2">
+                <img th:src="@{/uploads/{profilePicture}(profilePicture=${session.loggedInUser.profilePicture})}"
+                     alt="User Profile" width="30" height="30" class="rounded-circle mr-2">
                 <span th:text="${session.loggedInUser.username}">Username</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
@@ -125,7 +125,7 @@
         <div class="row">
             <div class="col-md-6" th:each="post : ${posts}">
                 <div class="card post-card">
-                    <img th:src="@{'/uploads/image.png' + ${post.postPhoto}}" class="card-img-top post-thumbnail"
+                    <img th:src="@{'/uploads/' + ${post.postPhoto}}" class="card-img-top post-thumbnail"
                          alt="Post Image">
                     <div class="card-body">
                         <h5 class="card-title" th:text="${post.title}">Post Title</h5>

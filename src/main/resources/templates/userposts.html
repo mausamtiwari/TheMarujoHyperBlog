@@ -97,8 +97,8 @@
         <div class="dropdown">
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="userDropdown"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" alt="User Profile" width="30" height="30"
-                     class="rounded-circle mr-2">
+                <img th:src="@{/uploads/{profilePicture}(profilePicture=${session.loggedInUser.profilePicture})}"
+                     alt="User Profile" width="30" height="30" class="rounded-circle mr-2">
                 <span th:text="${session.loggedInUser.username}">Username</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
@@ -122,21 +122,22 @@
 
 
     <div class="container mt-4">
-        <div th:each="post:${posts}">
-            <article>
-                <h1 class="article-title" th:text="${post.title}">Post Title</h1>
-                <div class="d-flex align-items-center author-info mb-3">
-                    <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" class="author-photo mr-2" alt="Author Photo">
-                    <div>
-                        <span class="author-name" th:text="${post.user.username}">Author Name</span> &middot;
-                        <span class="text-muted">4 min read</span> &middot;
-                        <span class="text-muted" th:text="${#dates.format(post.createdAt, 'MMM d, yyyy')}">Date</span>
+        <div class="row">
+            <div class="col-md-6" th:each="post : ${posts}">
+                <div class="card post-card">
+                    <img th:src="@{'/uploads/' + ${post.postPhoto}}" class="card-img-top post-thumbnail"
+                         alt="Post Image">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${post.title}">Post Title</h5>
+                        <p class="card-text" th:text="${post.content}">Post Content</p>
+                        <a th:href="@{'/posts/' + ${post.id}}" class="btn btn-primary">Read More</a>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <span th:text="${post.user.username}">Author Name</span> &middot;
+                        <span th:text="${#dates.format(post.createdAt, 'MMM d, yyyy')}">Date</span>
                     </div>
                 </div>
-                <div class="article-content">
-                    <p th:text="${post.content}">Post Content</p>
-                </div>
-            </article>
+            </div>
         </div>
     </div>
 

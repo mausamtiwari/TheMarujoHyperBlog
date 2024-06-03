@@ -83,4 +83,9 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findByUserNameAndPassword(String username, String password) {
         return userRepository.findByUsernameAndPassword(username, password);
     }
+
+    public int countUsers() {
+        return (int) userRepository.count();
+    }
+
 }

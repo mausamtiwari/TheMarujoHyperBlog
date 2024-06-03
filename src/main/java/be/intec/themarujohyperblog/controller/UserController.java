@@ -72,18 +72,81 @@ public class UserController {
             return "register";
         }
 
-       /* // Encode the password before saving the user
+       /*// Encode the password before saving the user
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         logger.debug("Raw password during registration: {}", user.getPassword());
         logger.debug("Encoded password during registration: {}", hashedPassword);
         user.setPassword(hashedPassword);*/
 
-        // Register user if all checks pass
+    // Register user if all checks pass
         userService.registerUser(user);
         logger.info("User registered with username: {}", user.getUsername());
         return "redirect:/login";
     }
+  /*  @PostMapping("/register")
+    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, @RequestParam("profilePicture") MultipartFile profilePicture, Model model) {
+        logger.info("Registering user: {}", user);
 
+        String validationResult = validateUser(user, result, model);
+        if (validationResult != null) {
+            return "register";
+        }
+
+        String checkResult = checkUsernameAndEmail(user, model);
+        if (checkResult != null) {
+            return "register";
+        }
+
+        // Handle file upload
+        if (!profilePicture.isEmpty()) {
+            String uploadError = handleFileUpload(profilePicture, user);
+            if (uploadError != null) {
+                model.addAttribute("error", uploadError);
+                return "register";
+            }
+        }
+
+        // Register user if all checks pass
+        userService.registerUser(user);
+        logger.info("User registered with username: {}", user.getUsername());
+        return "redirect:/login";
+    }*/
+
+    @PostMapping("/upload/{id}")
+    public String uploadProfilePicture(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file, HttpSession session) {
+        if (file.isEmpty()) {
+            return "redirect:/profile/" + id;
+        }
+        try {
+            Optional<User> optionalUser = userService.findUserById(id);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                String uploadError = handleFileUpload(file, user);
+                if (uploadError == null) {
+                    userService.registerUser(user);
+                    session.setAttribute("loggedInUser", user);
+                } else {
+                    logger.error(uploadError);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error occurred while uploading profile picture for user with id {}", id, e);
+        }
+        return "redirect:/profile/" + id;
+    }
+
+    private String handleFileUpload(MultipartFile file, User user) {
+        try {
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
+            Files.write(path, bytes);
+            user.setProfilePicture(file.getOriginalFilename());
+            return null; // No error
+        } catch (IOException e) {
+            logger.error("Error uploading profile picture", e);
+            return "Failed to upload profile picture. Please try again.";
+        }
+    }
 
     @GetMapping("/login")
     public String showLoginForm(@RequestParam(value = "error", required = false) String error, Model model) {
@@ -235,28 +298,6 @@ public class UserController {
         return "redirect:/profile/" + id;
     }
 
-    @PostMapping("/upload/{id}")
-    public String uploadProfilePicture(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return "redirect:/profile/" + id;
-        }
-        try {
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
-            Files.write(path, bytes);
-
-            Optional<User> optionalUser = userService.findUserById(id);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                user.setProfilePicture(file.getOriginalFilename());
-                userService.registerUser(user);
-            }
-
-        } catch (IOException e) {
-            logger.error("Error occurred while uploading profile picture for user with id {}", id, e);
-        }
-        return "redirect:/profile/" + id;
-    }
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {

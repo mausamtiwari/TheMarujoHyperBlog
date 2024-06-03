@@ -109,8 +109,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+
 
 
 @Controller
@@ -120,6 +126,7 @@ public class PostController {
     private final UserServiceImpl userService;
     private final LikeServiceImpl likeService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
 
     @Autowired
     public PostController(PostServiceImpl postService, UserServiceImpl userService, LikeServiceImpl likeService) {
@@ -157,18 +164,47 @@ public class PostController {
     }
 
     @PostMapping("/createPost")
-    public String createPost(@ModelAttribute("post") BlogPost post, HttpSession session, Model model) {
+    public String createPost(@ModelAttribute("post") BlogPost post, @RequestParam("file") MultipartFile file, HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
             logger.warn("User session not found, redirecting to login.");
             return "redirect:/login";
         }
-        List<BlogPost> userPosts = postService.getPostsByUser(user);
+
+        // Handle file upload
+        if (!file.isEmpty()) {
+            String uploadError = handleFileUpload(file, post);
+            if (uploadError != null) {
+                model.addAttribute("error", uploadError);
+                return "createpost"; // Adjust the view name as necessary
+            }
+        }
+
+        if (post.getDescription() == null || post.getDescription().trim().isEmpty()) {
+            post.setDescription("No description available");
+        }
+
+
         logger.info("Creating post for user: {}", user.getUsername());
         post.setUser(user);
         postService.savePost(post);
+
+        List<BlogPost> userPosts = postService.getPostsByUser(user);
         model.addAttribute("posts", userPosts);
-        return "userposts";
+        return "userposts"; // Adjust the view name as necessary
+    }
+
+    private String handleFileUpload(MultipartFile file, BlogPost post) {
+        try {
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
+            Files.write(path, bytes);
+            post.setPostPhoto(file.getOriginalFilename()); // Assuming the BlogPost entity has an 'image' field
+            return null; // No error
+        } catch (IOException e) {
+            logger.error("Error uploading image", e);
+            return "Failed to upload image. Please try again.";
+        }
     }
 
    /* @GetMapping("/afterlogin")
@@ -297,5 +333,20 @@ public class PostController {
         model.addAttribute("totalItems", page.getTotalElements()); //totaal aantal elementen op pagina
         model.addAttribute("postList", postList);
         return "blogcentral";
+    }
+
+    //get mapping to retrieve the number of posts and number of users in the database
+    @GetMapping("/stats")
+    public String getStats(Model model) {
+        long postCount = postService.countPosts();
+        long userCount = userService.countUsers();
+        model.addAttribute("postCount", postCount);
+        model.addAttribute("userCount", userCount);
+        return "stats";
+    }
+
+    @GetMapping("/notAuthorised")
+    public String notAuthorised() {
+        return "notauthorised";
     }
 }

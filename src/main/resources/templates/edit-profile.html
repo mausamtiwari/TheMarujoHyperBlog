@@ -80,8 +80,8 @@
     <header class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
             <a th:href="@{/afterlogin}">
-                <img src="/images/Marujo_The_Hyper_Blog_Logo.jpg" width="125" height="125" alt="Medium Logo"
-                     class="rounded-circle mr-2">
+                <img th:src="@{/uploads/{profilePicture}(profilePicture=${session.loggedInUser.profilePicture})}"
+                     alt="User Profile" width="30" height="30" class="rounded-circle mr-2">
             </a>
             <span class="font-weight-bold">Marujo</span>
         </div>
