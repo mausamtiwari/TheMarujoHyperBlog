@@ -17,6 +17,9 @@ public class BlogPost extends AuditModel {
     @Column(nullable = false)
     private String title;
 
+    @Column(nullable = true) // description toegevoegd, anders is het moeilijk een search te doen op inhoud.
+    private String description;
+
     @Lob
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -37,13 +40,23 @@ public class BlogPost extends AuditModel {
     // Default constructor
     public BlogPost() {}
 
+    public BlogPost(Long id, String title, String description, String content) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.content = content;
+    }
+
     // Constructor with all fields
     public BlogPost(Long id, @NotNull String title, String content, User user) {
         this.id = id;
         this.title = title;
+        this.description = description;
         this.content = content;
         this.user = user;
     }
+
+
 
     // Constructor without id
     public BlogPost(@NotNull String title, String content, User user) {
@@ -68,6 +81,11 @@ public class BlogPost extends AuditModel {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public String getDescription() { return description; }
+
+    public void setDescription(String description) { this.description = description; }
+
 
     public String getContent() {
         return content;

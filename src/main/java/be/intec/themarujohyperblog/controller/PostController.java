@@ -1,3 +1,4 @@
+
 /*package be.intec.themarujohyperblog.controller;
 
 import be.intec.themarujohyperblog.model.BlogPost;
@@ -94,7 +95,6 @@ public class PostController {
 
 package be.intec.themarujohyperblog.controller;
 
-import be.intec.themarujohyperblog.model.BlogComment;
 import be.intec.themarujohyperblog.model.Like;
 import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.model.User;
@@ -119,31 +119,18 @@ public class PostController {
     private final PostServiceImpl postService;
     private final UserServiceImpl userService;
     private final LikeServiceImpl likeService;
-
-    private final CommentServiceImpl commentService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    public PostController(PostServiceImpl postService, UserServiceImpl userService, LikeServiceImpl likeService, CommentServiceImpl commentService) {
+    public PostController(PostServiceImpl postService, UserServiceImpl userService, LikeServiceImpl likeService) {
         this.postService = postService;
         this.userService = userService;
         this.likeService = likeService;
-        this.commentService = commentService;
     }
 
     @GetMapping("/")  //root, eerste pagina
     public String viewHomePage(Model model) {
         return findPostPaginated(1, model); //dit beperkt ons tot 1 pagina?
-    }
-
-    @GetMapping("/posts/{id}")
-    public String getPostDetails(@PathVariable Long id, Model model) {
-        BlogPost post = postService.getPostById(id);
-        List<BlogComment> comments = commentService.findCommentByPostId(id);
-        model.addAttribute("post", post);
-        model.addAttribute("comments", comments);
-        model.addAttribute("newComment", new BlogComment());
-        return "blogpostdetail";
     }
 
     /* @GetMapping("/{id}")
@@ -184,35 +171,22 @@ public class PostController {
         return "userposts";
     }
 
-    @GetMapping("/afterlogin")
-    public String afterLogin(Model model,
-                             HttpSession session,
-                             @RequestParam(value = "0", defaultValue = "1") int page) {
-        int pageSize = 6;
-
-        // Get the logged-in user from the session
-        User user = (User) session.getAttribute("loggedInUser");
-        if (user == null) {
-            return "redirect:/login";
-        }
-
-        // Fetch paginated posts
+   /* @GetMapping("/afterlogin")
+    public String afterLogin(Model model, HttpSession session, @RequestParam(value = "page", defaultValue = "1") int page) {
+        int pageSize = 6; // number of posts per page
         Page<BlogPost> postPage = postService.findPostPaginated(page, pageSize);
         List<BlogPost> posts = postPage.getContent();
 
-        // Add attributes to the model
+        logger.info("Rendering afterlogin with currentPage: {}, totalPages: {}", page, postPage.getTotalPages());
+
         model.addAttribute("posts", posts);
-        model.addAttribute("currentPage", page + 1);
+        model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", postPage.getTotalPages());
-        model.addAttribute("totalItems", postPage.getTotalElements());
+        model.addAttribute("session", session);
+        return "afterlogin";
+    }*/
 
-        return "afterlogin"; // This should be the name of your Thymeleaf template
-    }
-
-
-
-
-  /*  @GetMapping("/afterlogin")
+    @GetMapping("/afterlogin")
     public String afterLogin(Model model, HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
@@ -222,7 +196,7 @@ public class PostController {
         model.addAttribute("posts", getPosts);
         //model.addAttribute("session", session);
         return "afterlogin";
-    }*/
+    }
 
 
     @GetMapping("/myPosts")
@@ -325,4 +299,3 @@ public class PostController {
         return "blogcentral";
     }
 }
-
