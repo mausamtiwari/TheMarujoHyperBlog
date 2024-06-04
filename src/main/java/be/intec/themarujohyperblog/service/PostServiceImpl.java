@@ -100,7 +100,20 @@ public class PostServiceImpl implements PostService{
         return postRepository.findByDescriptionContaining(search, PageRequest.of(0, 6));
     }
 
+    @Override
+    public List<BlogPost> getSortedPosts(String sortBy) {
+        Sort sort;
+        if ("recent".equals(sortBy)) {
+            sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        } else if ("oldest".equals(sortBy)) {
+            sort = Sort.by(Sort.Direction.ASC, "createdAt");
+        } else {
+            sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        }
+        return postRepository.findAll(sort);
+    }
     public long countPosts() {
+
         return (int) postRepository.count();
     }
 

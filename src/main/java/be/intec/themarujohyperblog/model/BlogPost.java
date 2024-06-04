@@ -38,7 +38,7 @@ public class BlogPost extends AuditModel {
     @Lob
     @Column(name = "image_data", columnDefinition = "LONGBLOB")
     private byte[] imageData;
-    @Column(nullable = true)
+    @Column(nullable = false)
     private LocalDateTime date;
     // Default constructor
     public BlogPost() {}
@@ -137,9 +137,6 @@ public class BlogPost extends AuditModel {
         this.imageData = imageData;
     }
 
-    public int getPopularity() {
-        return likes != null ? likes.size() : 0;
-    }
 
 }
 

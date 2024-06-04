@@ -32,11 +32,10 @@
 
 </nav>
 <!-- Page header with logo and tagline-->
-<header class="py-0 bg-light border-bottom mb-4">
+<header class="py-5 bg-light border-bottom mb-4">
     <div class="container">
         <div class="text-center my-5">
-
-            <h2 class="fw-bolder">Welcome to the Marujo HyperBlog</h2>
+            <h1 class="fw-bolder">Welcome to the Marujo HyperBlog</h1>
             <p class="lead mb-0">Below is a list of the most recent posts.</p>
         </div>
     </div>
@@ -47,17 +46,17 @@
     <div class="row">
         <!-- Container for the main content -->
         <div class="col-lg-8">
-            <h3>Posts</h3>
+            <h1>Posts</h1>
             <!-- Loop through each post in the postList and display it -->
             <div th:each="post : ${postList}" class="post-card p-3 mb-3 border rounded shadow-sm">
-                <h4 th:text="${post.title}"></h4>
-                <p class="text"> Created by: <span th:text="${post.user.username}"></span> Date:  <span th:text="${#dates.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+                <h2 th:text="${post.title}"></h2>
+                <p class="text-muted"> Created at: <span th:text="${#dates.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </p>
                 <!-- If the post was updated, display the updated date -->
                 <p th:if="${post.updatedAt ne post.createdAt}" class="text-muted"> Updated at: <span
-                        th:text="${#dates.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span></p>
+                    th:text="${#dates.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span></p>
 
-
+                <p th:text="${post.user.username}"></p><!-- User = author van de post -->
                 <div th:text="${post.description}"></div>   <!-- Description of the post -->
                 <!-- Buttons to edit, delete, and view comments for the post -->
 
@@ -70,40 +69,16 @@
                     <a class="btn btn-secondary" th:href="@{'/posts/' + ${post.id} + '/comments'}">View Comments</a>
                 </div>
             </div>
-            <div th:if="${totalPages > 1}">
-                <div class="row mt-4">
-                    <div class="col-sm-12">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item">
-                                    <a th:if="${currentPage > 1}" class="page-link" th:href="@{'/page/' + ${1}}">First</a>
-                                </li>
-                                <li class="page-item">
-                                    <a th:if="${currentPage > 1}" class="page-link" th:href="@{'/page/' + ${currentPage - 1}}">Previous</a>
-                                </li>
-                                <li th:each="i:${#numbers.sequence(1, totalPages)}" class="page-item"
-                                    th:classappend="${currentPage == i} ? 'active' : ''">
-                                    <a class="page-link" th:if="${currentPage != i}" th:href="@{'/page/' + ${i}}"
-                                       th:text="${i}"></a>
-                                    <span class="page-link" th:unless="${currentPage != i}" th:text="${i}"></span>
-                                </li>
-                                <li class="page-item">
-                                    <a th:if="${currentPage < totalPages}" class="page-link"
-                                       th:href="@{'/page/' + ${currentPage + 1}}">Next</a>
-                                </li>
-                                <li class="page-item">
-                                    <a th:if="${currentPage < totalPages}" class="page-link" th:href="@{'/page/' + ${totalPages}}">Last</a>
-                                </li>
-                            </ul>
-                        </nav>
-                        <p class="mt-2">Total Posts: <span th:text="${totalItems}"></span></p>
-                    </div>
-                </div>
-
-            </div>
-
+            <ul class="pagination justify-content-center my-4">
+                <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
+                <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
+                <li class="page-item"><a class="page-link" href="#!">2</a></li>
+                <li class="page-item"><a class="page-link" href="#!">3</a></li>
+                <li class="page-item disabled"><a class="page-link" href="#!">...</a></li>
+                <li class="page-item"><a class="page-link" href="#!">15</a></li>
+                <li class="page-item"><a class="page-link" href="#!">Older</a></li>
+            </ul>
         </div>
-
         <!-- Side widgets-->
         <div class="col-md-4 sidebar-container">
             <div class="sidebar">
@@ -129,42 +104,15 @@
                                 </ul>
                             </div>
 
-                            <!-- Add more links as needed -->
-                        </div>
-                    </div>
-
-                </div>
+                <!-- Add more links as needed -->
             </div>
-            <!-- Footer-->
-            <footer class="py-5 bg-dark">
-                <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p></div>
-            </footer>
-            <!-- Bootstrap core JS-->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-            <!-- Core theme JS-->
-            <script src="js/scripts.js"></script>
         </div>
+
     </div>
 </div>
-
 <!-- Footer-->
 <footer class="py-5 bg-dark">
-    <div class="container">
-        <!-- Display  MarujoLogo2.jpg from assets folder-->
-        <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/assets/MarujoLogo2small.png}" alt="Marujo Logo" /></div>
-
-
-
-        <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
-        </div>
-        <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/assets/MarujoLogo2small.png}" alt="Marujo Logo" /></div>
-
-
-
-        <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
-        </div>
-
-
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p></div>
 </footer>
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -173,7 +121,6 @@
         </div>
 </div>
 </div>
-
 
 </body>
 </html>
