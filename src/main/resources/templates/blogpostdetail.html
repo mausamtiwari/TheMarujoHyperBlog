@@ -59,12 +59,15 @@
                 </p>
             <!-- Buttons to edit post, delete post using @GetMapping("/updatePost/{id}" and @PostMapping("/updatePost/{id}")-->
             <div class="mt-3">
-               <!-- goes to page show form with the current post, and a submit button-->
+                <a class="btn btn-primary" href="javascript:history.back()">Back to overview</a>
+
+                <!-- edit button goes to page show form with the current post, and a submit button-->
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editPostModal">
                     Edit Post
                 </button>
-                <form th:action="@{'/deletePost/' + ${post.getId()}}" method="post">
-                    <input type="submit" value="Delete" class="btn btn-danger"/>
+
+                <form th:action="@{'/deletePost/' + ${post.getId()}}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
 
             </div>
@@ -119,8 +122,8 @@
                     <p class="text-muted text-right"> Added on: <span th:text="${#dates.format(comment.updatedAt, 'dd-MM-yyyy HH:mm')}"></span></p>
 
                        <!--button to delete the comment-->
-                       <form th:action="@{'/deleteComment/'+${post.id}+'/'+${comment.id}}" method="post">
-                           <input type="submit" value="Delete" class="btn btn-danger"/>
+                       <form th:action="@{'/deletePost/' + ${post.getId()}}" method="post" style="display:inline;">
+                           <button type="submit" class="btn btn-primary">Delete</button>
                        </form>
 
                    </div>
