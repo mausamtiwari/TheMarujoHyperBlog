@@ -10,8 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -47,6 +46,25 @@ public class PostServiceImpl implements PostService{
     @Override
     public List<BlogPost> getAllPosts() {
         return postRepository.findAll();
+    }
+
+    @Override
+    public List<BlogPost> searchPostsByTitleDescriptionContentContaining(String search) {
+
+        List<BlogPost> searchDescriptionResult = postRepository.findByDescriptionContaining(search);
+        List<BlogPost> searchContentResult = postRepository.findByContentContaining(search);
+        List<BlogPost> searchTitleResult = postRepository.findByTitleContaining(search);
+
+        //Resultaten in een Set samenvoegen (=unieke waarden) en terug omzetten naar een gewone List:
+
+        Set<BlogPost> searchResultSet = new HashSet<>();
+        searchResultSet.addAll(searchDescriptionResult);
+        searchResultSet.addAll(searchContentResult);
+        searchResultSet.addAll(searchTitleResult);
+
+        List<BlogPost> searchResultList = new ArrayList<>(searchResultSet);
+
+        return searchResultList;
     }
 
     @Override
@@ -95,10 +113,6 @@ public class PostServiceImpl implements PostService{
         return this.postRepository.findAll(pageable);
     }
 
-    @Override
-    public List<BlogPost> searchByDescriptionAndContent(String searchString) {
-        return postRepository.findByDescriptionOrContent(searchString, searchString);
-    }
 
 
 
@@ -106,7 +120,8 @@ public class PostServiceImpl implements PostService{
 
 
 
-    public int countPosts() {
+
+    public long countAllBlogPosts() {
         return (int) postRepository.count();
     }
 
@@ -179,9 +194,6 @@ public class PostServiceImpl implements PostService{
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("createdAt").descending());
         return this.postRepository.findByUser(user, pageable);
     }
+*/
 
-    @Override
-    public Page<BlogPost> searchPostDescription(String search) {
-        return postRepository.findByDescriptionContaining(search, PageRequest.of(0, 6));
-    }*/
 }

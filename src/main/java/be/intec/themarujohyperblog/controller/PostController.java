@@ -268,38 +268,38 @@ public class PostController {
     }*/
 
     @GetMapping("/updatePost/{postId}")
-    public String showUpdatePostForm(@PathVariable("postId") Long postId, Model model, HttpSession session) {
-        //check that the post belongs to the user
+    public String showUpdatePostForm(@PathVariable("postId") Long postId, Model model) {
+    //Authorisation gebeurt in PostMapping, niet mogelijk hier httpsession te krijgen
 
-        User user = (User) session.getAttribute("loggedInUser");
-        if (user == null) {
-            return "redirect:/login";
-        }
         BlogPost post = postService.getPostById(postId);
-        if (!Objects.equals(post.getUser().getId(), user.getId())) {
-            //niet geauthoriseerd: post behoort niet tot de user
-            return "redirect:/notAuthorised";
-        }
-        System.out.println("user:" + user);
-        System.out.println("post user:" + post.getUser());
-
 
         model.addAttribute("post", post);
+
         return "redirect:/saveUpdatedPost/{postId}";
     }
 
 
     @PostMapping("/saveUpdatedPost/{postId}")
-    public String updatePost(@PathVariable("postId") Long postId, @ModelAttribute("post") BlogPost post) {
-
+    public String updatePost(@PathVariable("postId") Long postId, @ModelAttribute("post") BlogPost post, HttpSession session) {
+        //Check voor niet-ingelogde visitor
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
         BlogPost existingPost = postService.getPostById(postId);
 
+        //check of de session id == post.user.id
+        if (!Objects.equals(post.getUser().getId(), user.getId())) {
+            //niet geauthoriseerd: post behoort niet tot de user
+            return "redirect:/notAuthorised";
+        }  else {
         existingPost.setTitle(post.getTitle());
         existingPost.setDescription(post.getDescription());
         existingPost.setContent(post.getContent());
         //existingPost.setComments(post.getComments());
         existingPost.setUpdatedAt(new Date());
         postService.savePost(existingPost);
+        }
         return "redirect:/viewPost/{postId}";
     }
 
@@ -414,11 +414,11 @@ public class PostController {
     //get mapping to retrieve the number of posts and number of users in the database
     @GetMapping("/stats")
     public String getStats(Model model) {
-        long postCount = postService.countPosts();
+        long postCount = postService.countAllBlogPosts();
         long userCount = userService.countUsers();
         model.addAttribute("postCount", postCount);
         model.addAttribute("userCount", userCount);
-        return "stats";
+        return "blogcentral";
     }
 
     @GetMapping("/notAuthorised")
@@ -427,20 +427,27 @@ public class PostController {
     }
 
 
-    //PostMapping to search blogpost description and content
-    @PostMapping("/sendSearchString")
-    public String sendSearchString(@RequestParam("searchString") String searchString, Model model, HttpSession session) {
-        List<BlogPost> searchResultList = postService.searchByDescriptionAndContent(searchString);
+
+
+
+
+    //PostMapping used in blogcentral.html to search blogpost description and content
+        @GetMapping("/sendSearchString")
+    public String sendSearchString(@RequestParam("searchString") String searchString, Model model) {
+        List<BlogPost> searchResultList = postService.searchPostsByTitleDescriptionContentContaining(searchString);
         model.addAttribute("searchResultList", searchResultList);
-        return "redirect:/sendSearchResult";
+        return "searchResults";
     }
 
+    /*
     //GetMapping to send searchResultList to the requesting HTML viewer
     @GetMapping("/sendSearchResult")
     public String sendSearchResultList(@RequestParam("searchResultList") List<BlogPost> searchResultList, Model model) {
         model.addAttribute("searchResultList", searchResultList);
         return "searchResults";
     }
+    */
+
 
 
 
