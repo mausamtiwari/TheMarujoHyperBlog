@@ -96,9 +96,15 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public Page<BlogPost> searchPostDescription(String search) {
-        return postRepository.findByDescriptionContaining(search, PageRequest.of(0, 6));
+    public List<BlogPost> searchByDescriptionAndContent(String searchString) {
+        return postRepository.findByDescriptionOrContent(searchString, searchString);
     }
+
+
+
+
+
+
 
     public int countPosts() {
         return (int) postRepository.count();

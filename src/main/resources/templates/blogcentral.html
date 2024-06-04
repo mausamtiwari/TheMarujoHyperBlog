@@ -63,11 +63,9 @@
 
                 <div class="mt-3">
                     <!-- <a class="btn btn-primary" th:href="@{'/createPost/' + ${post.id}}">Create</a> -->
-                    <a class="btn btn-primary" th:href="@{'/viewPost/' + ${post.id}}">View</a>
+                    <a class="btn btn-primary" th:href="@{'/viewPost/' + ${post.id}}">See more ...</a>
 
-                    <a class="btn btn-primary" th:href="@{'/updatePost/' + ${post.id}}">Edit</a>
-                    <a class="btn btn-danger" th:href="@{'/deletePost/' + ${post.id}}">Delete</a>
-                    <a class="btn btn-secondary" th:href="@{'/posts/' + ${post.id} + '/comments'}">View Comments</a>
+
                 </div>
             </div>
             <div th:if="${totalPages > 1}">
@@ -96,7 +94,7 @@
                                 </li>
                             </ul>
                         </nav>
-                        <p class="mt-2">Total Posts: <span th:text="${totalItems}"></span></p>
+
                     </div>
                 </div>
 
@@ -111,10 +109,15 @@
                 <div class="card mb-4">
                     <div class="card-header">Search</div>
                     <div class="card-body">
+
                         <div class="input-group">
-                            <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                            <button class="btn btn-primary" id="button-search" type="button">Go!</button>
+                            <form action="/sendSearchString" method="post">
+                                <input class="form-control" type="text" name="searchString" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
+                                <button class="btn btn-primary" id="button-search" type="submit">Go!</button>
+                            </form>
                         </div>
+
+
                     </div>
                 </div>
                 <div class="card mb-4">
@@ -123,9 +126,9 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <ul class="list-unstyled mb-0">
-                                    <li><a href="#!">Who is logged in?</a></li>
-                                    <li><a href="#!">Number of visitors</a></li>
-                                    <li><a href="#!">You are the nth visitor</a></li>
+                                    <li><p class="mt-2">Total Posts: <span th:text="${totalItems}"></span></p>
+                                    <li> Total number of Blog users: ....</a></li>
+                                    <li> Number of comments: ......</a></li>
                                 </ul>
                             </div>
 
@@ -145,12 +148,7 @@
 
         <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
         </div>
-        <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/assets/MarujoLogo2small.png}" alt="Marujo Logo" /></div>
 
-
-
-        <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
-        </div>
 
 
 </footer>
