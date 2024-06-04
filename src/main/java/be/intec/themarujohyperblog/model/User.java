@@ -63,6 +63,25 @@ public class User {
     private List<Like> likes;
 
 
+    public User(Long id, String firstName, String lastName, String username, List<BlogComment> comments, List<Like> likes, boolean enabled) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.comments = comments;
+        this.likes = likes;
+        this.enabled = enabled;
+    }
+
+     public User() {  }
+/*
+    public User(Long id, String username) {
+        this.id = id;
+        this.username = username;
+    }
+
+    */
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -198,4 +217,12 @@ public class User {
     public int hashCode() {
         return Objects.hash(id, firstName, lastName, username, password, email, profilePicture, enabled, blogPosts, comments, likes);
     }
+
+    //add a default anonymous user
+
+    public User(String username) {
+        this.username = username;
+    }
+
+
 }
