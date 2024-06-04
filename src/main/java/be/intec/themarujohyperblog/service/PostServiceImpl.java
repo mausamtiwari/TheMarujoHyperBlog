@@ -121,7 +121,7 @@ public class PostServiceImpl implements PostService{
 
 
 
-    public int countPosts() {
+    public long countAllBlogPosts() {
         return (int) postRepository.count();
     }
 

@@ -33,7 +33,7 @@ public interface PostService {
 
     Page<BlogPost> findPostPaginatedByIDDown(int pageNo, int pageSize);
 
-
+    long countAllBlogPosts();
 
 
     //missing?

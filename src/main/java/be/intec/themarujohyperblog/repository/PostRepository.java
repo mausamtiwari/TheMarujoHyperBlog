@@ -24,5 +24,7 @@ public interface PostRepository extends JpaRepository<BlogPost, Long> {
         List<BlogPost> findByContentContaining(String search);
 
         List<BlogPost> findByTitleContaining(String search);
+
+
 }
 

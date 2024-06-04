@@ -414,11 +414,11 @@ public class PostController {
     //get mapping to retrieve the number of posts and number of users in the database
     @GetMapping("/stats")
     public String getStats(Model model) {
-        long postCount = postService.countPosts();
+        long postCount = postService.countAllBlogPosts();
         long userCount = userService.countUsers();
         model.addAttribute("postCount", postCount);
         model.addAttribute("userCount", userCount);
-        return "stats";
+        return "blogcentral";
     }
 
     @GetMapping("/notAuthorised")
