@@ -57,6 +57,10 @@ public class UserController {
         this.postService = postService;
     }
 
+    //add anonymous user without password, to be used to add comments
+    //User anonymous = new User(99999999L, "anonymous");
+   // userService.addUser(anonymous);
+
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         model.addAttribute("user", new User());
