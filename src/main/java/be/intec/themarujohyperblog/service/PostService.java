@@ -38,5 +38,7 @@ public interface PostService {
     Page<BlogPost> findPostPaginatedByIDDown(int pageNo, int pageSize);
 
     Page<BlogPost> searchPostDescription(String search);
+
+    List<BlogPost> getSortedPosts(String sortBy);
 }
 
