@@ -49,7 +49,7 @@
         <div class="col-lg-8">
             <h3>Posts</h3>
             <!-- Loop through each post in the postList and display it -->
-            <div th:each="post : ${postList}" class="post-card p-3 mb-3 border rounded shadow-sm">
+            <div th:each="post : ${searchResultList}" class="post-card p-3 mb-3 border rounded shadow-sm">
                 <h4 th:text="${post.title}"></h4>
                 <p class="text"> Created by: <span th:text="${post.user.username}"></span> Date:  <span th:text="${#dates.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </p>
@@ -67,6 +67,9 @@
 
 
                 </div>
+            </div>
+            <div class="text-center">
+            <a class="btn btn-primary" href="javascript:history.back()">Back</a>
             </div>
             <div th:if="${totalPages > 1}">
                 <div class="row mt-4">
@@ -110,8 +113,10 @@
                     <div class="card-header">Search</div>
                     <div class="card-body">
                         <div class="input-group">
-                            <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                            <button class="btn btn-primary" id="button-search" type="button">Go!</button>
+                            <form action="/sendSearchString" method="get">
+                                <input class="form-control" type="text" name="searchString" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
+                                <button class="btn btn-primary" id="button-search" type="submit">Go!</button>
+                            </form>
                         </div>
                     </div>
                 </div>

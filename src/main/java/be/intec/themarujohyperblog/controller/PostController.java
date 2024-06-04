@@ -427,20 +427,27 @@ public class PostController {
     }
 
 
-    //PostMapping to search blogpost description and content
-    @PostMapping("/sendSearchString")
-    public String sendSearchString(@RequestParam("searchString") String searchString, Model model, HttpSession session) {
-        List<BlogPost> searchResultList = postService.searchByDescriptionAndContent(searchString);
+
+
+
+
+    //PostMapping used in blogcentral.html to search blogpost description and content
+        @GetMapping("/sendSearchString")
+    public String sendSearchString(@RequestParam("searchString") String searchString, Model model) {
+        List<BlogPost> searchResultList = postService.searchPostsByTitleDescriptionContentContaining(searchString);
         model.addAttribute("searchResultList", searchResultList);
-        return "redirect:/sendSearchResult";
+        return "searchResults";
     }
 
+    /*
     //GetMapping to send searchResultList to the requesting HTML viewer
     @GetMapping("/sendSearchResult")
     public String sendSearchResultList(@RequestParam("searchResultList") List<BlogPost> searchResultList, Model model) {
         model.addAttribute("searchResultList", searchResultList);
         return "searchResults";
     }
+    */
+
 
 
 
