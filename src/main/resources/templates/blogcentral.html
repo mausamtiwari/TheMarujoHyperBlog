@@ -45,14 +45,39 @@
             margin-bottom: 10px;
         }
 
+        .author-info {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
         .author-info .author-photo {
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            margin-right: 10px;
         }
 
         .author-name {
             font-weight: bold;
+        }
+
+        .post-card {
+            height: 100%;
+        }
+
+        .post-thumbnail {
+            height: 200px;
+            object-fit: cover;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
         }
 
         .article-content {
@@ -102,17 +127,22 @@
     </header>
 
     <div class="row">
-        <div class="col-md-6" th:each="post : ${postList}">
-            <div class="card post-card">
+        <div class="col-md-6 mb-4" th:each="post : ${postList}">
+            <div class="card post-card h-100">
                 <img th:src="@{'/uploads/' + ${post.postPhoto}}" class="card-img-top post-thumbnail" alt="Post Image">
-                <div class="card-body">
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title" th:text="${post.title}">Post Title</h5>
-                    <p class="card-text" th:text="${post.content}">Post Content</p>
-                    <a th:href="@{'/posts/' + ${post.id}}" class="btn btn-primary">Read More</a>
+                    <p class="card-text" th:text="${#strings.abbreviate(post.content, 250)}">Post Content</p>
+                    <a class="btn btn-primary mt-auto" th:href="@{'/viewPost/' + ${post.id}}">See more ...</a>
                 </div>
                 <div class="card-footer text-muted">
-                    <span th:text="${post.user.username}">Author Name</span> &middot;
-                    <span th:text="${#dates.format(post.createdAt, 'MMM d, yyyy')}">Date</span>
+                    <div class="author-info">
+                        <img th:src="@{'/uploads/' + ${post.user.profilePicture}}" class="author-photo" alt="Author Photo">
+                        <span th:text="${post.user.username}" class="author-name">Author Name</span>
+                    </div>
+                    <div>
+                        <span th:text="${#dates.format(post.createdAt, 'MMM d, yyyy')}">Date</span>
+                    </div>
                 </div>
             </div>
         </div>
