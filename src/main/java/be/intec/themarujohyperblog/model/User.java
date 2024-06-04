@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,6 +64,7 @@ public class User {
     private List<Like> likes;
 
 
+
     public User(Long id, String firstName, String lastName, String username, List<BlogComment> comments, List<Like> likes, boolean enabled) {
         this.id = id;
         this.firstName = firstName;
@@ -81,6 +83,7 @@ public class User {
     }
 
     */
+
 
     @Override
     public boolean equals(Object o) {

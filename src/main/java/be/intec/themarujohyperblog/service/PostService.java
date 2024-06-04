@@ -26,8 +26,6 @@ public interface PostService {
 
     Page<BlogPost> findUserPostsPaginated(User user, int pageNo, int pageSize);
 
-
-
     List<BlogPost> getAllPosts();
     void savePost(BlogPost post);
 

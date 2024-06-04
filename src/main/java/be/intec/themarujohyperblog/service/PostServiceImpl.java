@@ -100,7 +100,9 @@ public class PostServiceImpl implements PostService{
         return postRepository.findByDescriptionContaining(search, PageRequest.of(0, 6));
     }
 
+
     public int countPosts() {
+
         return (int) postRepository.count();
     }
 

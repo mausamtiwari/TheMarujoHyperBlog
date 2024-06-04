@@ -3,8 +3,6 @@ package be.intec.themarujohyperblog.service;
 import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -77,9 +75,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
-
-
     @Override
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
@@ -117,13 +112,6 @@ public class UserServiceImpl implements UserService {
     public int countUsers() {
         return (int) userRepository.count();
     }
-
-
-
-
-
-
-
 
    /* @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

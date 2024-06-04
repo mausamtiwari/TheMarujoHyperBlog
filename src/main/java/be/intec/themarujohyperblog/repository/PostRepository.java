@@ -14,9 +14,8 @@ import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<BlogPost, Long> {
-
-
-
+    
+        long count();
         List<BlogPost> findByUser(User user);
 
         Page<BlogPost> findByUser(User user, Pageable pageable);
