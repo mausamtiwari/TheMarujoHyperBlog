@@ -8,8 +8,10 @@ import java.util.List;
 public interface CommentService {
     List<BlogComment> getAllComment();
     void saveComment(BlogComment comment);
-    BlogComment getCommentById(Long id);
-    void deleteCommentById(Long commentId );
+    BlogComment findCommentById(Long id);
+    void deleteComment(Long commentId );
+
+    List<BlogComment> findCommentByPostId(Long postId);
     Page<BlogComment> findCommentPaginated(Long postId, int pageNo, int pageSize);
 }
 
