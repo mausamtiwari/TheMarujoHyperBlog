@@ -10,7 +10,8 @@ public interface CommentService {
     void saveComment(BlogComment comment);
     BlogComment findCommentById(Long id);
     void deleteComment(Long commentId );
-
+    BlogComment getCommentById(Long id);
+    void deleteCommentById(Long commentId );
     List<BlogComment> findCommentByPostId(Long postId);
     Page<BlogComment> findCommentPaginated(Long postId, int pageNo, int pageSize);
 }

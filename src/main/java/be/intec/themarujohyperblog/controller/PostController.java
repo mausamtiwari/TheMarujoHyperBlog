@@ -1,97 +1,5 @@
 
-/*package be.intec.themarujohyperblog.controller;
 
-import be.intec.themarujohyperblog.model.BlogPost;
-import be.intec.themarujohyperblog.model.User;
-import be.intec.themarujohyperblog.service.PostService;
-import be.intec.themarujohyperblog.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
-import java.util.List;
-
-@Controller
-public class PostController {
-
-    private final PostService postService;
-
-    private  final UserService userService;
-
-    @Autowired
-    public PostController(PostService postService, UserService userService) {
-        this.postService = postService;
-        this.userService = userService;
-    }
-
-    @GetMapping("/")
-    public String index(Model model) {
-        List<BlogPost> posts = postService.findAll();
-        model.addAttribute("posts", posts);
-        return "blogcentral";
-    }
-
-    @GetMapping("/posts/{id}")
-    public String viewPost(@PathVariable Long id, Model model) {
-        BlogPost post = postService.findById(id);
-        model.addAttribute("post", post);
-        return "post";
-    }
-
-    @GetMapping("/create_post")
-    public String createPost(Model model) {
-        model.addAttribute("post", new BlogPost());
-        return "create_post";
-    }
-
-    @PostMapping("/create_post")
-    public String savePost(BlogPost post) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
-
-        post.setUser(user);
-        post.setCreatedAt(new Date());
-        postService.saveBlogPost(post);
-        return "redirect:/";
-    }
-
-    @GetMapping("/edit_post/{id}")
-    public String editPost(@PathVariable Long id, Model model) {
-        BlogPost post = postService.findById(id);
-        model.addAttribute("post", post);
-        return "create_post";
-    }
-
-    @PostMapping("/edit-post/{id}")
-    public String updatePost(@PathVariable Long id, BlogPost post) {
-        BlogPost existingPost = postService.findById(id);
-        existingPost.setTitle(post.getTitle());
-        existingPost.setContent(post.getContent());
-        postService.saveBlogPost(existingPost);
-        return "redirect:/posts/" + id;
-    }
-
-    @GetMapping("/delete-post/{id}")
-    public String deletePost(@PathVariable Long id) {
-        BlogPost post = postService.findById(id);
-        postService.delete(post);
-        return "redirect:/";
-    }
-
-    @PostMapping("/like-post/{id}")
-    public String likePost(@PathVariable Long id) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
-
-        BlogPost post = postService.findById(id);
-        user.getLikedPosts().add(post);
-        userService.saveUser(user);
-        return "redirect:/posts/" + id;
-    }
-}*/
 
 package be.intec.themarujohyperblog.controller;
 
@@ -339,23 +247,7 @@ public class PostController {
 
     }
     //delete blogpost comment for a specific postid and check the identity of the logged user
-    @PostMapping("/deleteComment/{postId}/{commentId}")
-    public String deleteComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId, HttpSession session) {
-        //get session identity
-        User user = (User) session.getAttribute("loggedInUser");
-        if (user == null) {
-            return "redirect:/notAuthorised";
-        }
-        BlogComment comment = commentService.findCommentById(commentId);
-        //check if the comment belongs to the user:
-        if (!Objects.equals(comment.getUser().getId(), user.getId())) {
-            //niet geauthoriseerd: comment behoort niet tot de user
-            return "redirect:/notAuthorised";
-        } else {
-            commentService.findCommentById(commentId);
-        }
-        return "redirect:/viewPost/" + postId;
-    }
+
 
 
     @PostMapping("/like")
@@ -453,74 +345,9 @@ public class PostController {
         return "searchResults";
     }
 
-    /*
-    //GetMapping to send searchResultList to the requesting HTML viewer
-    @GetMapping("/sendSearchResult")
-    public String sendSearchResultList(@RequestParam("searchResultList") List<BlogPost> searchResultList, Model model) {
-        model.addAttribute("searchResultList", searchResultList);
-        return "searchResults";
-    }
-    */
-
-}
 
 
-    //get mapping to retrieve the number of posts and number of users in the database
-    @GetMapping("/stats")
-    public String getStats(Model model) {
-        long postCount = postService.countPosts();
-        long userCount = userService.countUsers();
-        model.addAttribute("postCount", postCount);
-        model.addAttribute("userCount", userCount);
-        return "stats";
-    }
 
-    @GetMapping("/notAuthorised")
-    public String notAuthorised() {
-        return "notauthorised";
-    }
-
-    //method om individuele post te bekijken en de bijhorende comments in de vorm van pageable list en findCommentPaginated
-    @GetMapping("/viewPost/{id}")
-    public String viewPost(@PathVariable("id") Long id,
-                           @RequestParam(name = "page", defaultValue = "1") int pageNo,
-                           Model model, HttpSession session) {
-        BlogPost post = postService.getPostById(id);
-        model.addAttribute("post", post);
-
-        // Alle comments toevoegen aan het model als pageable
-        int pageSize = 5; // Set the number of comments per page
-        Page<BlogComment> page = commentService.findCommentPaginated(id, pageNo, pageSize);
-        List<BlogComment> commentList = page.getContent();
-
-        model.addAttribute("currentPage", pageNo);
-        model.addAttribute("totalPages", page.getTotalPages());
-        model.addAttribute("totalItems", page.getTotalElements());
-        model.addAttribute("commentList", commentList);
-
-        model.addAttribute("newComment", new BlogComment());
-
-        return "blogpostdetail";
-    }
-
-    // methode om nieuwe comment toe te voegen aan een post
-    @PostMapping("/blog_post/{blogpostId}/blog_comment")
-    public String createComment(@PathVariable(value = "blogpostId") Long postId,
-                                HttpSession session, Model model,
-                                @ModelAttribute("commentText") BlogComment newComment) {
-        BlogPost post = postService.getPostById(postId);
-
-        //User met post verbinden, of anders met anonymous
-        User user = (User) session.getAttribute("loggedInUser");
-        if (user == null) {
-            user = userService.findByUserName("anonymous").orElseThrow(() -> new IllegalArgumentException("Invalid username"));
-        }
-        newComment.setUser(user);
-        newComment.setPost(post);
-
-        commentService.saveComment(newComment);
-        return "redirect:/viewPost/" + postId;
-    }
 
     @PostMapping("/likePost/{id}")
     public String likePost(@PathVariable Long id, HttpSession session) {
