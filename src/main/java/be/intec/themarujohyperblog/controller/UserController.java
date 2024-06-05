@@ -62,60 +62,13 @@ public class UserController {
    // userService.addUser(anonymous);
 
     @GetMapping("/register")
-    public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new User());
-        return "register";
-    }
-
-    // TODO PasswordMatchesValidator bug fix
-    // Password confirmation validation error .
-   /* @PostMapping("/register")
-    public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, Model model, BindingResult result) {
-        // System.out.println("Registering user: " + user);
-        logger.info("Registering user: {}", user);
-
-        // Check for validation errors
-        if (result.hasErrors()) {
-            result.getAllErrors().forEach(error -> logger.warn("Validation error: {}", error));
-            model.addAttribute("error", "Validation failed");
-            return "redirect:/register";
-        }
-
-        Optional<User> existingUserName = userService.findByUserName(user.getUsername());
-        if (existingUserName.isPresent()) {
-            logger.warn("User already exists: {}", username);
-            model.addAttribute("error", "Username already exists");
-            return "redirect:/register";
-        }
-
-        Optional<User> existingEmail = userService.findUserByEmail(user.getEmail());
-        if (existingEmail.isPresent()) {
-            logger.warn("User already exists with email: {}", existingEmail);
-            model.addAttribute("error", "Email already exists");
-            return "redirect:/register";
-        }
-
-        // Check for password match
-        if (!passwordMatchesValidator.isValid(user,null)) {
-            model.addAttribute("error", "Passwords do not match");
-            return "redirect:/register";
-        }
-
-        // Register user if all checks pass
-        userService.registerUser(user);
-        logger.info("User registered with username: {}", user.getUsername());
-        return "redirect:/login";
-    }
-
-
-    @GetMapping("/login")
-    public String showLoginForm(@RequestParam(value = "error", required = false) String error, Model model) {
+    public String showRegistrationForm(@RequestParam(value = "error", required = false) String error, Model model) {
         model.addAttribute("user", new User());
         if (error != null) {
             model.addAttribute("error", "Invalid username or password");
         }
-        return "login";
-    }*/
+        return "register";
+    }
 
     @PostMapping("/register")
     public String registerUser(@RequestParam("username") String username, @Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
@@ -162,7 +115,41 @@ public class UserController {
         logger.info("User registered with username: {}", user.getUsername());
         return "redirect:/login";
     }
+    @PostMapping("/upload/{id}")
+    public String uploadProfilePicture(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file, HttpSession session) {
+        if (file.isEmpty()) {
+            return "redirect:/bloghome/" + id;
+        }
+        try {
+            Optional<User> optionalUser = userService.findUserById(id);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                String uploadError = handleFileUpload(file, user);
+                if (uploadError == null) {
+                    userService.registerUser(user);
+                    session.setAttribute("loggedInUser", user);
+                } else {
+                    logger.error(uploadError);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error occurred while uploading profile picture for user with id {}", id, e);
+        }
+        return "redirect:/bloghome/" + id;
+    }
 
+    private String handleFileUpload(MultipartFile file, User user) {
+        try {
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
+            Files.write(path, bytes);
+            user.setProfilePicture(file.getOriginalFilename());
+            return null; // No error
+        } catch (IOException e) {
+            logger.error("Error uploading profile picture", e);
+            return "Failed to upload profile picture. Please try again.";
+        }
+    }
     @GetMapping("/login")
     public String showLoginForm(@RequestParam(value = "error", required = false) String error, Model model) {
         model.addAttribute("user", new User());
@@ -209,31 +196,7 @@ public class UserController {
     }
 
 
-   /*@PostMapping("/login")
-    public String login(@RequestParam("username") String username, @RequestParam("password") String password, Model model) {
-        User user = userService.findByUserName(username).orElse(null);
-        if (user == null || !BCrypt.checkpw(password, user.getPassword())) {
-            model.addAttribute("error", "Invalid username or password");
-            return "login";
-        }
-        model.addAttribute("user", user);
-        return "redirect:/blogcentral";
-    }*/
-
-  /*  @GetMapping("/myPosts")
-    public String showMyPosts(Model model, @RequestParam(value = "page", defaultValue = "1") int page, @AuthenticationPrincipal User user) {
-        int pageSize = 5; // Number of posts per page
-        Pageable pageable = PageRequest.of(page - 1, pageSize);
-
-        Page<BlogPost> userPosts = postService.getPostsByUser(user, pageable);
-        model.addAttribute("userPosts", userPosts);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", userPosts.getTotalPages());
-
-        return "userposts";
-    }*/
-
-    @GetMapping("/profile/{id}")
+    @GetMapping("/bloghome/{id}")
     public String viewUserProfile(@PathVariable("id") Long id, Model model) {
         Optional<User> optionalUser = userService.findUserById(id);
         if (optionalUser.isEmpty()) {
@@ -241,7 +204,7 @@ public class UserController {
             return "error";
         }
         model.addAttribute("user", optionalUser.get());
-        return "profile";
+        return "bloghome";
     }
 
 
@@ -276,7 +239,7 @@ public class UserController {
         updatedUser.setConfirmPassword(user.getConfirmPassword());
 
         userService.registerUser(updatedUser);
-        return "redirect:/profile";
+        return "redirect:/bloghome";
     }
 
     @PostMapping("/user/delete/{id}")
@@ -307,31 +270,9 @@ public class UserController {
             user.setProfilePicture(null);
             userService.registerUser(user);
         }
-        return "redirect:/profile/" + id;
+        return "redirect:/bloghome/" + id;
     }
 
-    @PostMapping("/upload/{id}")
-    public String uploadProfilePicture(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return "redirect:/profile/" + id;
-        }
-        try {
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
-            Files.write(path, bytes);
-
-            Optional<User> optionalUser = userService.findUserById(id);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                user.setProfilePicture(file.getOriginalFilename());
-                userService.registerUser(user);
-            }
-
-        } catch (IOException e) {
-            logger.error("Error occurred while uploading profile picture for user with id {}", id, e);
-        }
-        return "redirect:/profile/" + id;
-    }
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
@@ -344,6 +285,4 @@ public class UserController {
         session.invalidate();
         return "redirect:/login?logout";
     }
-
-
 }

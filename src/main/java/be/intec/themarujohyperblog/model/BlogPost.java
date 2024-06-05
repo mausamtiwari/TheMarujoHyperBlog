@@ -38,7 +38,9 @@ public class BlogPost extends AuditModel {
     @Lob
     @Column(name = "image_data", columnDefinition = "LONGBLOB")
     private byte[] imageData;
-    @Column(nullable = false)
+
+    @Column(name = "post_photo")
+    private String postPhoto;
     private LocalDateTime date;
     // Default constructor
     public BlogPost() {}
@@ -137,6 +139,12 @@ public class BlogPost extends AuditModel {
         this.imageData = imageData;
     }
 
+    public String getPostPhoto() {
+        return postPhoto;
+    }
 
+    public void setPostPhoto(String postPhoto) {
+        this.postPhoto = postPhoto;
+    }
 }
 
