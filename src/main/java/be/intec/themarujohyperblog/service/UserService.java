@@ -12,7 +12,8 @@ public interface UserService {
 
     void registerUser(User user);
 
-    public User updateUser(User user);
+     void updateUser(User user);
+    User save(User user);
 
     void deleteUser(Long userId);
 
@@ -23,7 +24,7 @@ public interface UserService {
 
     Optional<User> findByUserNameAndPassword(String username, String password);
 
-   // UserDetails loadUserByUsername(String username);
+    // UserDetails loadUserByUsername(String username);
 
 
 
