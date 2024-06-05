@@ -29,11 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
+import java.util.*;
 
 
 @Controller
@@ -316,15 +312,7 @@ public class PostController {
     public void unlikePost(@PathVariable("id") Long id) {
         likeService.deleteLike(id);
     }
-    //get mapping to retrieve the number of posts and number of users in the database
 
-    @GetMapping("/stats")
-    public ResponseEntity<Map<String, Long>> getStats() {
-        Map<String, Long> stats = new HashMap<>();
-        stats.put("postCount", postService.countPosts());
-        stats.put("userCount", userService.countUsers());
-        return ResponseEntity.ok(stats);
-    }
     @GetMapping("/posts")
     public List<BlogPost> getPosts(@RequestParam String sortBy) {
         List<BlogPost> posts = postService.getAllPosts();
