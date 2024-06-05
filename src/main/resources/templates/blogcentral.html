@@ -24,7 +24,6 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="/login">Log in </a></li>
                 <li class="nav-item"><a class="nav-link" href="/register">Register as new Author</a></li>
-                <li class="nav-item"><a class="nav-link" href="/search">Search in blog descriptions</a></li>
                 <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li>
 
             </ul>
@@ -53,6 +52,9 @@
             <!-- Loop through each post in the postList and display it -->
             <div th:each="post : ${postList}" class="post-card p-3 mb-3 border rounded shadow-sm">
                 <h4 th:text="${post.title}"></h4>
+                <!-- If the post has a photo, display it -->
+                <img th:if="${post.postPhoto}" th:src="@{'/uploads/' + ${post.postPhoto}}" class="img-fluid rounded mb-3"
+                     alt="Post Image"/>
                 <p class="text"> Created by: <span th:text="${post.user.username}"></span> Date:  <span th:text="${#dates.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </p>
                 <!-- If the post was updated, display the updated date -->
