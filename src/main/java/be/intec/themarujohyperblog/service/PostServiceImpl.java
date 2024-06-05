@@ -1,19 +1,28 @@
 package be.intec.themarujohyperblog.service;
 
 import be.intec.themarujohyperblog.model.BlogPost;
+import be.intec.themarujohyperblog.model.Like;
 import be.intec.themarujohyperblog.model.User;
+import be.intec.themarujohyperblog.repository.LikeRepository;
 import be.intec.themarujohyperblog.repository.PostRepository;
+import be.intec.themarujohyperblog.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,10 +31,21 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
+    private  CommentServiceImpl commentService;
+
+
+
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImpl(PostRepository postRepository, LikeRepository likeRepository) {
         this.postRepository = postRepository;
+        this.likeRepository = likeRepository;
+    }
+
+    @Autowired
+    public void setCommentService(CommentServiceImpl commentService) {
+        this.commentService = commentService;
     }
 
     @Override
@@ -111,7 +131,28 @@ public class PostServiceImpl implements PostService {
     }
 
 
+
+
     public int countPosts() {
         return (int) postRepository.count();
+    }
+
+    @Override
+    @Transactional
+    public void likeOrUnlikePost(Long postId, User user) {
+        BlogPost post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+        Optional<Like> existingLike = likeRepository.findByUserAndPost(user, post);
+        if (existingLike.isPresent()) {
+            likeRepository.delete(existingLike.get());
+        } else {
+            Like like = new Like();
+            like.setUser(user);
+            like.setPost(post);
+            likeRepository.save(like);
+        }
+    }
+    public int countLikes(BlogPost post) {
+        return post.getLikes().size();
     }
 }

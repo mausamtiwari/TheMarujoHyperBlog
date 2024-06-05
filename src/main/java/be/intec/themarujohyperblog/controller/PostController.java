@@ -99,11 +99,13 @@ import be.intec.themarujohyperblog.model.BlogComment;
 import be.intec.themarujohyperblog.model.Like;
 import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.model.User;
+import be.intec.themarujohyperblog.repository.UserRepository;
 import be.intec.themarujohyperblog.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -116,28 +118,37 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Controller
 public class PostController {
 
-    private final PostServiceImpl postService;
+    private PostServiceImpl postService;
     private final UserServiceImpl userService;
     private final LikeServiceImpl likeService;
+
+    private final UserRepository userRepository;
 
     private final CommentServiceImpl commentService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
 
     @Autowired
-    public PostController(PostServiceImpl postService, UserServiceImpl userService, LikeServiceImpl likeService, CommentServiceImpl commentService) {
-        this.postService = postService;
+    public PostController( UserServiceImpl userService, LikeServiceImpl likeService, UserRepository userRepository, CommentServiceImpl commentService) {
         this.userService = userService;
         this.likeService = likeService;
+        this.userRepository = userRepository;
         this.commentService = commentService;
+    }
+
+    @Autowired
+    public void setPostService(@Lazy PostServiceImpl postService) {
+        this.postService = postService;
     }
 
     @GetMapping("/")  //root, eerste pagina
@@ -201,22 +212,25 @@ public class PostController {
         }
     }
 
-   /* @GetMapping("/afterlogin")
-    public String afterLogin(Model model, HttpSession session, @RequestParam(value = "page", defaultValue = "1") int page) {
+    @GetMapping("/afterlogin")
+    public String afterLogin(
+            @RequestParam(name = "page", defaultValue = "1") int pageNo,
+            Model model, HttpSession session) {
+
         int pageSize = 6; // number of posts per page
-        Page<BlogPost> postPage = postService.findPostPaginated(page, pageSize);
+        Page<BlogPost> postPage = postService.findPostPaginated(pageNo, pageSize);
         List<BlogPost> posts = postPage.getContent();
 
-        logger.info("Rendering afterlogin with currentPage: {}, totalPages: {}", page, postPage.getTotalPages());
-
         model.addAttribute("posts", posts);
-        model.addAttribute("currentPage", page);
+        model.addAttribute("currentPage", pageNo);
         model.addAttribute("totalPages", postPage.getTotalPages());
-        model.addAttribute("session", session);
-        return "afterlogin";
-    }*/
+        model.addAttribute("totalItems", postPage.getTotalElements());
 
-    @GetMapping("/afterlogin")
+        return "afterlogin";
+    }
+
+
+   /* @GetMapping("/afterlogin")
     public String afterLogin(Model model, HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
@@ -226,7 +240,7 @@ public class PostController {
         model.addAttribute("posts", getPosts);
         //model.addAttribute("session", session);
         return "afterlogin";
-    }
+    }*/
 
 
     @GetMapping("/myPosts")
@@ -445,5 +459,16 @@ public class PostController {
         return "redirect:/viewPost/" + postId;
     }
 
-
+    @PostMapping("/likePost/{id}")
+    public String likePost(@PathVariable Long id, HttpSession session) {
+        User sessionUser = (User) session.getAttribute("loggedInUser");
+        if (sessionUser == null) {
+            return "redirect:/login";
+        }
+        Optional<User> user = userRepository.findByUsername(sessionUser.getUsername());
+        if (user.isPresent()) {
+            postService.likeOrUnlikePost(id, user.get());
+        }
+        return "redirect:/viewPost/" + id;
+    }
 }

@@ -27,7 +27,7 @@ public class LikeServiceImpl {
     }
 
     public Optional<Like> findByPostAndUser(BlogPost post, User user) {
-        return likeRepository.findByPostAndUser(post, user);
+        return likeRepository.findByUserAndPost(user,post);
     }
 
     public boolean toggleLike(BlogPost post, User user) {

@@ -40,5 +40,7 @@ public interface PostService {
     Page<BlogPost> findPostPaginatedByIDDown(int pageNo, int pageSize);
 
     Page<BlogPost> searchPostDescription(String search);
+
+    void likeOrUnlikePost(Long postId, User user);
 }
 

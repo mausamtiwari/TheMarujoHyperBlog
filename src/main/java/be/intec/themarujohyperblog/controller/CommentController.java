@@ -4,6 +4,7 @@ import be.intec.themarujohyperblog.model.BlogComment;
 import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,18 +15,15 @@ import java.util.List;
 @Controller
 public class CommentController {
 
-    private final CommentServiceImpl commentService;
 
-    private final PostServiceImpl postService;
+    private final CommentService commentService;
+    private PostServiceImpl postService;
 
-    private final UserServiceImpl userService;
-
-    @Autowired
-    public CommentController(CommentServiceImpl commentService, PostServiceImpl postService, UserServiceImpl userService) {
+    public CommentController(CommentService commentService, @Lazy PostServiceImpl postService) {
         this.commentService = commentService;
         this.postService = postService;
-        this.userService = userService;
     }
+
 
     //Handles GET request for displaying all comments for a specific post
    //JDR: this will be handled in the post controller

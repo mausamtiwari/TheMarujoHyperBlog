@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.groups.Default;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,7 +65,7 @@ public class User {
     private List<BlogComment> comments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes;
+    private List<Like> likes = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

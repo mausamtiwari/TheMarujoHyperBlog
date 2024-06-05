@@ -11,7 +11,7 @@
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="css/styles.css" rel="stylesheet"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
 <!-- Responsive navbar-->
@@ -64,17 +64,22 @@
                 </p>
                 <div class="d-flex align-items-center mb-4">
                     <div class="like-button mr-3">
-                        <i class="fas fa-thumbs-up"></i> Like
+                        <form th:action="@{'/likePost/' + ${post.id}}" method="post">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-thumbs-up"></i> Like
+                            </button>
+                        </form>
                     </div>
-                    <span>123 Likes</span> <!-- Replace with dynamic like count -->
+                    <span th:text="${post.likes + ' Likes'}"></span>
                 </div>
+
 
                 <!-- Buttons to edit post, delete post using @GetMapping("/updatePost/{id}" and @PostMapping("/updatePost/{id}")-->
                 <div class="mt-3">
                     <a class="btn btn-primary" href="javascript:history.back()">Back to overview</a>
 
                     <!-- edit button goes to page show form with the current post, and a submit button-->
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    <button th:action="@{/saveUpdatedPost/{id}(id=${post.id})}" method="get"  type="button" class="btn btn-primary" data-bs-toggle="modal"
                             data-bs-target="#editPostModal">
                         Edit Post
                     </button>
@@ -241,7 +246,9 @@
                     '23</p></div>
             </footer>
             <!-- Bootstrap core JS-->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
             <!-- Core theme JS-->
             <script src="js/scripts.js"></script>
         </div>
