@@ -21,9 +21,6 @@ public interface PostService {
 
     BlogPost getPostById(Long blogPostId);
 
-
-
-
     List<BlogPost> getPostsByUser(User user); // Add this method
 
     Page<BlogPost> findUserPostsPaginated(User user, int pageNo, int pageSize);
