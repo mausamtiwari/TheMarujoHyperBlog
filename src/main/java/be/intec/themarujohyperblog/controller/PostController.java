@@ -15,12 +15,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -78,6 +81,60 @@ public class PostController {
         return "createpost";
     }
 
+   /* @PostMapping("/createPost")
+    public String createPost(@ModelAttribute("post") BlogPost post, @RequestParam("image") MultipartFile imageFile, HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            logger.warn("User session not found, redirecting to login.");
+            return "redirect:/login";
+        }
+
+        if (post.getDescription() == null || post.getDescription().trim().isEmpty()) {
+            post.setDescription("No description available");
+        }
+
+        if (!imageFile.isEmpty()) {
+            try {
+                byte[] imageData = imageFile.getBytes();
+
+                // Logging image size
+                long imageSize = imageData.length;
+                logger.info("Uploaded image size: {} bytes", imageSize);
+
+                // Ensure image size does not exceed 10MB
+                if (imageSize > 10 * 1024 * 1024) {
+                    logger.error("File size exceeds 10MB limit.");
+                    model.addAttribute("error", "File size exceeds 10MB limit.");
+                    // You may also want to return to the form with the previously entered data
+                    return "createpost";
+                }
+
+                post.setImageData(imageData);
+            } catch (IOException e) {
+                logger.error("Error processing image upload: {}", e.getMessage(), e);
+                model.addAttribute("error", "Error processing image upload.");
+                // Return to the form with an error message
+                return "createpost";
+            }
+        }
+
+        try {
+            logger.info("Creating post for user: {}", user.getUsername());
+            post.setCreatedAt(new Date());
+            post.setUpdatedAt(new Date());
+            post.setUser(user);
+            postService.savePost(post);
+        } catch (Exception e) {
+            logger.error("Error saving post: {}", e.getMessage(), e);
+            model.addAttribute("error", "Error saving post.");
+            // Return to the form with an error message
+            return "createpost";
+        }
+
+        // Redirect to the user's post list page after successful creation
+        return "posts";
+    }*/
+
     @PostMapping("/createPost")
     public String createPost(@ModelAttribute("post") BlogPost post, @RequestParam("file") MultipartFile file, HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedInUser");
@@ -98,8 +155,6 @@ public class PostController {
 
 
 
-
-
         List<BlogPost> userPosts = postService.getPostsByUser(user);
 
         logger.info("Creating post for user: {}", user.getUsername());
@@ -107,10 +162,7 @@ public class PostController {
         post.setUpdatedAt(new Date());//JDR
         post.setUser(user);
         postService.savePost(post);
-      
-
-
-      
+       
         return "redirect:/afterlogin"; // Adjust the view name as necessary
 
     }
@@ -132,6 +184,7 @@ public class PostController {
     public String afterLogin(
             @RequestParam(name = "page", defaultValue = "1") int pageNo,
             Model model, HttpSession session) {
+
 
         int pageSize = 6; // number of posts per page
         Page<BlogPost> postPage = postService.findPostPaginated(pageNo, pageSize);
@@ -207,6 +260,8 @@ public class PostController {
 
     //delete post and check the identity of the logged user
     @PostMapping("/deletePost/{id}")
+  
+  
     public String deletePost(@PathVariable("id") Long postId, HttpSession session) {
         //get session identity
         User user = (User) session.getAttribute("loggedInUser");
@@ -260,6 +315,29 @@ public class PostController {
     @ResponseBody
     public void unlikePost(@PathVariable("id") Long id) {
         likeService.deleteLike(id);
+    }
+    //get mapping to retrieve the number of posts and number of users in the database
+
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Long>> getStats() {
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("postCount", postService.countPosts());
+        stats.put("userCount", userService.countUsers());
+        return ResponseEntity.ok(stats);
+    }
+    @GetMapping("/posts")
+    public List<BlogPost> getPosts(@RequestParam String sortBy) {
+        List<BlogPost> posts = postService.getAllPosts();
+
+        if (sortBy.equals("recent")) {
+            posts.sort(Comparator.comparing(BlogPost::getDate).reversed());
+        } else if (sortBy.equals("oldest")) {
+            posts.sort(Comparator.comparing(BlogPost::getDate));
+        } else if (sortBy.equals("popularity")) {
+            posts.sort(Comparator.comparing(BlogPost::getPopularity).reversed());
+        }
+
+        return posts;
     }
 
     @GetMapping("/page/{pageNo}")
