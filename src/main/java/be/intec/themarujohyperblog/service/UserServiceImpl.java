@@ -4,6 +4,7 @@ import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,47 +34,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void registerUser(User user) {
-        if (user.getId() != null) {
-            // Editing an existing employee
-            Optional<User> existingUserOptional = userRepository.findById(user.getId());
-            if (existingUserOptional.isPresent()) {
-                User existingUser = existingUserOptional.get();
-                if (!existingUser.getEmail().equals(user.getEmail())) {
-                    // Check if the new email is taken by another user
-                    Optional<User> emailCheckUser = userRepository.findByEmail(user.getEmail());
-                    if (emailCheckUser.isPresent()) {
-                        throw new IllegalStateException("email taken");
-                    }
-                }
-                // Save the updated employee details
-                userRepository.save(user);
-            } else {
-                throw new IllegalStateException("user not found");
-            }
-        } else {
-            // Creating a new employee
-            Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
-            if (optionalUser.isPresent()) {
-                throw new IllegalStateException("email taken");
-            }
-            userRepository.save(user);
-        }
-        // JDR: Add a user with userName="anonymous" to the database if does not already exist
-
-        Optional<User> anonymousUserOptional = userRepository.findByUsername("anonymous");
-        if (anonymousUserOptional.isEmpty()) {
-            User anonymousUser = new User();
-            //moved setEnabled(true) to the end of the block
-            anonymousUser.setFirstName("anonymous");
-            anonymousUser.setLastName("anonymous");
-            anonymousUser.setUsername("anonymous");
-            anonymousUser.setPassword("Anon@123");
-            anonymousUser.setEmail("anonymous@yahoo.com");
-            anonymousUser.setEnabled(true); // JDR: error message for validation, changing false to true: is this the solution???
-            userRepository.save(anonymousUser);
-        }
-
+       /* String rawPassword = user.getPassword();
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        logger.debug("Raw password during registration: {}", rawPassword);
+        logger.debug("Encoded password during registration: {}", encodedPassword);
+        user.setPassword(encodedPassword);*/
+        user.setEnabled(true);
+        userRepository.save(user);
     }
+
+
 
     @Override
     public void deleteUser(Long userId) {
@@ -95,8 +65,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) {
-        return userRepository.save(user);
+    @Validated(User.UpdateGroup.class)
+    public User updateUser(@Validated(User.UpdateGroup.class) User user) {
+        //user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        return user;
     }
 
     @Override
@@ -113,17 +86,4 @@ public class UserServiceImpl implements UserService {
         return (int) userRepository.count();
     }
 
-   /* @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isEmpty()) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        User user = userOptional.get();
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .roles("USER")
-                .build();
-    }*/
 }
