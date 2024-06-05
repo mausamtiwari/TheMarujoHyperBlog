@@ -87,34 +87,7 @@ public class UserController {
         logger.info("User registered with username: {}", user.getUsername());
         return "redirect:/login";
     }
-  /*  @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, @RequestParam("profilePicture") MultipartFile profilePicture, Model model) {
-        logger.info("Registering user: {}", user);
 
-        String validationResult = validateUser(user, result, model);
-        if (validationResult != null) {
-            return "register";
-        }
-
-        String checkResult = checkUsernameAndEmail(user, model);
-        if (checkResult != null) {
-            return "register";
-        }
-
-        // Handle file upload
-        if (!profilePicture.isEmpty()) {
-            String uploadError = handleFileUpload(profilePicture, user);
-            if (uploadError != null) {
-                model.addAttribute("error", uploadError);
-                return "register";
-            }
-        }
-
-        // Register user if all checks pass
-        userService.registerUser(user);
-        logger.info("User registered with username: {}", user.getUsername());
-        return "redirect:/login";
-    }*/
 
     @PostMapping("/upload/{id}")
     public String uploadProfilePicture(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file, HttpSession session) {
