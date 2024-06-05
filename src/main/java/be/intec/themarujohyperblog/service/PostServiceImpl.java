@@ -13,6 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -83,6 +87,7 @@ public  class PostServiceImpl implements PostService{
         return postOptional.get();
     }
 
+
     @Override
     public void deletePost(Long id) {
         postRepository.deleteById(id);
@@ -97,6 +102,10 @@ public  class PostServiceImpl implements PostService{
         return this.postRepository.findAll(pageable);
     }
 
+    public void saveImage(byte[] imageBytes, String imagePath) throws IOException {
+        Path path = Paths.get(imagePath);
+        Files.write(path, imageBytes);
+    }
     @Override
     public Page<BlogPost> findPostPaginatedByIDUp(int pageNo, int pageSize) {
         //Sorteert by ID in toenemende volgorde
