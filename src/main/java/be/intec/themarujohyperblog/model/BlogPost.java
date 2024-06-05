@@ -3,6 +3,7 @@ package be.intec.themarujohyperblog.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,8 +32,14 @@ public class BlogPost extends AuditModel {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BlogComment> comments;
 
+    /*@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes;*/
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes;
+    private List<Like> likes = new ArrayList<>();
+
+    @Column(name = "post_photo")
+    private String postPhoto;
 
     // Default constructor
     public BlogPost() {}
@@ -107,6 +114,30 @@ public class BlogPost extends AuditModel {
     public void setComments(List<BlogComment> comments) {
         this.comments = comments;
     }
+
+  /*  public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }*/
+
+    public String getPostPhoto() {
+        return postPhoto;
+    }
+
+    public void setPostPhoto(String postPhoto) {
+        this.postPhoto = postPhoto;
+    }
+
+  /*  public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }*/
 
     public List<Like> getLikes() {
         return likes;

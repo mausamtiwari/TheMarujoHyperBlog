@@ -22,6 +22,7 @@ public class CustomErrorController implements ErrorController {
         if (status != null) {
             // Converts the status object  to int
             int statusCode = (int) status;
+
             {
                 User user = (User) session.getAttribute("loggedInUser");
                 if (user != null) {

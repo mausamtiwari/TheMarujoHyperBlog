@@ -28,13 +28,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public BlogComment getCommentById(Long id) {
+    public BlogComment findCommentById(Long id) {
         Optional<BlogComment> comment = commentRepository.findById(id);
         return comment.orElseThrow(() -> new RuntimeException("Comment not found for id :: " + id));
     }
 
     @Override
-    public void deleteCommentById(Long id) {
+    public void deleteComment(Long id) {
         boolean exists = commentRepository.existsById(id);
         if (!exists) {
             throw new IllegalStateException("Comment id " + id + " not found");
@@ -42,6 +42,10 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteById(id);
     }
 
+    @Override
+    public List<BlogComment> findCommentByPostId(Long postId) {
+        return commentRepository.findByPostId(postId);
+    }
 
     @Override
     public Page<BlogComment> findCommentPaginated(Long postId, int pageNo, int pageSize) {
@@ -51,5 +55,9 @@ public class CommentServiceImpl implements CommentService {
         // Uses the commentRepository to find comments by the postId with pagination
         // The method findByPostId takes the postId and pageable as arguments and returns a Page<Comment> containing the comments for that page.
         return commentRepository.findByPostId(postId, pageable);
+    }
+
+    public BlogComment findById(Long id) {
+        return commentRepository.findById(id).orElse(null);
     }
 }
