@@ -188,7 +188,7 @@ public class PostController {
         BlogPost existingPost = postService.getPostById(postId);
 
         //check of de session id == post.user.id
-        if (!Objects.equals(post.getUser().getId(), user.getId())) {
+        if (!Objects.equals(existingPost.getUser().getId(), user.getId())) {
             //niet geauthoriseerd: post behoort niet tot de user
             return "redirect:/notAuthorised";
         }  else {
