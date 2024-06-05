@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,17 +33,26 @@ public class BlogPost extends AuditModel {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BlogComment> comments;
 
+    /*@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes;*/
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes;
-
+    private List<Like> likes = new ArrayList<>();
     @Lob
     @Column(name = "image_data", columnDefinition = "LONGBLOB")
     private byte[] imageData;
-    @Column(nullable = false)
+
+    @Column(name = "post_photo")
+    private String postPhoto;
     private LocalDateTime date;
     // Default constructor
     public BlogPost() {}
 
+    public BlogPost(Long id, String title, String description, String content) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.content = content;
+    }
     // Constructor with all fields
     public BlogPost(Long id, @NotNull String title, String description, String content, User user, byte[] imageData, LocalDateTime date) {
         this.id = id;
@@ -137,6 +147,12 @@ public class BlogPost extends AuditModel {
         this.imageData = imageData;
     }
 
+    public String getPostPhoto() {
+        return postPhoto;
+    }
 
+    public void setPostPhoto(String postPhoto) {
+        this.postPhoto = postPhoto;
+    }
 }
 

@@ -10,6 +10,8 @@ import java.util.List;
 import be.intec.themarujohyperblog.model.BlogPost;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 public interface PostService {
@@ -27,6 +29,9 @@ public interface PostService {
     Page<BlogPost> findUserPostsPaginated(User user, int pageNo, int pageSize);
 
     List<BlogPost> getAllPosts();
+
+    List<BlogPost> searchPostsByTitleDescriptionContentContaining(String search);
+
     void savePost(BlogPost post);
 
     BlogPost getPost(Long id);
@@ -40,5 +45,8 @@ public interface PostService {
     Page<BlogPost> searchPostDescription(String search);
 
     List<BlogPost> getSortedPosts(String sortBy);
+
+    @Transactional
+    void likeOrUnlikePost(Long postId, User user);
 }
 

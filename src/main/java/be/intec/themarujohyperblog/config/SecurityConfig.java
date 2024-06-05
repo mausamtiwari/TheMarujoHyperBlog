@@ -64,7 +64,4 @@ public class SecurityConfig {
             response.sendRedirect("/login?error=true");
         };
     }
-
-
-
 }

@@ -20,7 +20,9 @@ public interface PostRepository extends JpaRepository<BlogPost, Long> {
 
         Page<BlogPost> findByUser(User user, Pageable pageable);
 
-        Page<BlogPost> findByDescriptionContaining(String search, PageRequest of);
+        Page<BlogPost> findByDescriptionContaining(String search, Pageable pageable);
+    List<BlogPost> findByContentContaining(String search);
 
+    List<BlogPost> findByTitleContaining(String search);
     }
 

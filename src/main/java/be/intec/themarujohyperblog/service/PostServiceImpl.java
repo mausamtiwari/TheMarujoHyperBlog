@@ -1,7 +1,9 @@
 package be.intec.themarujohyperblog.service;
 
 import be.intec.themarujohyperblog.model.BlogPost;
+import be.intec.themarujohyperblog.model.Like;
 import be.intec.themarujohyperblog.model.User;
+import be.intec.themarujohyperblog.repository.LikeRepository;
 import be.intec.themarujohyperblog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,18 +11,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
-public class PostServiceImpl implements PostService{
-
+public  class PostServiceImpl implements PostService{
+    private final LikeRepository likeRepository;
     private final PostRepository postRepository;
 
     @Autowired
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImpl(LikeRepository likeRepository, PostRepository postRepository) {
+        this.likeRepository = likeRepository;
         this.postRepository = postRepository;
     }
 
@@ -48,7 +51,24 @@ public class PostServiceImpl implements PostService{
     public List<BlogPost> getAllPosts() {
         return postRepository.findAll();
     }
+    @Override
+    public List<BlogPost> searchPostsByTitleDescriptionContentContaining(String search) {
 
+        List<BlogPost> searchDescriptionResult = (List<BlogPost>) postRepository.findByDescriptionContaining(search, Pageable.unpaged());
+        List<BlogPost> searchContentResult = postRepository.findByContentContaining(search);
+        List<BlogPost> searchTitleResult = postRepository.findByTitleContaining(search);
+
+        //Resultaten in een Set samenvoegen (=unieke waarden) en terug omzetten naar een gewone List:
+
+        Set<BlogPost> searchResultSet = new HashSet<>();
+        searchResultSet.addAll(searchDescriptionResult);
+        searchResultSet.addAll(searchContentResult);
+        searchResultSet.addAll(searchTitleResult);
+
+        List<BlogPost> searchResultList = new ArrayList<>(searchResultSet);
+
+        return searchResultList;
+    }
     @Override
     public void savePost(BlogPost post) {
         postRepository.save(post);
@@ -97,7 +117,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public Page<BlogPost> searchPostDescription(String search) {
-        return postRepository.findByDescriptionContaining(search, PageRequest.of(0, 6));
+        return null;
     }
 
     @Override
@@ -115,6 +135,24 @@ public class PostServiceImpl implements PostService{
     public long countPosts() {
 
         return (int) postRepository.count();
+    }
+    @Override
+    @Transactional
+    public void likeOrUnlikePost(Long postId, User user) {
+        BlogPost post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid post Id:" + postId));
+        Optional<Like> existingLike = likeRepository.findByUserAndPost(user, post);
+        if (existingLike.isPresent()) {
+            likeRepository.delete(existingLike.get());
+        } else {
+            Like like = new Like();
+            like.setUser(user);
+            like.setPost(post);
+            likeRepository.save(like);
+        }
+    }
+    public int countLikes(BlogPost post) {
+        return post.getLikes().size();
     }
 
     //missing?
