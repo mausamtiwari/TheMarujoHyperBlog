@@ -1,9 +1,17 @@
 package be.intec.themarujohyperblog.service;
 
+import be.intec.themarujohyperblog.controller.UserController;
 import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,76 +20,45 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    //private final BCryptPasswordEncoder passwordEncoder;
 
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
+        //this.passwordEncoder = passwordEncoder;
     }
-
 
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
- /*  @Override
-    public void registerUser(User user) {
-        userRepository.save(user);
-    }*/
-
     @Override
     public void registerUser(User user) {
-        if (user.getId() != null) {
-            // Editing an existing employee
-            Optional<User> existingUserOptional = userRepository.findById(user.getId());
-            if (existingUserOptional.isPresent()) {
-                User existingUser = existingUserOptional.get();
-                if (!existingUser.getEmail().equals(user.getEmail())) {
-                    // Check if the new email is taken by another user
-                    Optional<User> emailCheckUser = userRepository.findByEmail(user.getEmail());
-                    if (emailCheckUser.isPresent()) {
-                        throw new IllegalStateException("email taken");
-                    }
-                }
-                // Save the updated employee details
-                userRepository.save(user);
-            } else {
-                throw new IllegalStateException("user not found");
-            }
-        } else {
-            // Creating a new employee
-            Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
-            if (optionalUser.isPresent()) {
-                throw new IllegalStateException("email taken");
-            }
-            userRepository.save(user);
-        }
-        // JDR: Add a user with userName="anonymous" to the database if does not already exist
+       /* String rawPassword = user.getPassword();
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        logger.debug("Raw password during registration: {}", rawPassword);
+        logger.debug("Encoded password during registration: {}", encodedPassword);
+        user.setPassword(encodedPassword);*/
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
 
-        Optional<User> anonymousUserOptional = userRepository.findByUsername("anonymous");
-        if (anonymousUserOptional.isEmpty()) {
-            User anonymousUser = new User();
-            //moved setEnabled(true) to the end of the block
-            anonymousUser.setFirstName("anonymous");
-            anonymousUser.setLastName("anonymous");
-            anonymousUser.setUsername("anonymous");
-            anonymousUser.setPassword("Anon@123");
-            anonymousUser.setEmail("anonymous@yahoo.com");
-            anonymousUser.setEnabled(true); // JDR: error message for validation, changing false to true: is this the solution???
-            userRepository.save(anonymousUser);
-        }
 
+
+    @Override
+    public User save(User user) {
+        // user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
 
     @Override
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
-    }
-
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
     }
 
     @Override
@@ -95,8 +72,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) {
-        return userRepository.save(user);
+    @Validated(User.UpdateGroup.class)
+    public void updateUser(@Validated(User.UpdateGroup.class) User user) {
+        //user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
     }
 
     @Override
@@ -113,17 +92,9 @@ public class UserServiceImpl implements UserService {
         return (int) userRepository.count();
     }
 
-   /* @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isEmpty()) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        User user = userOptional.get();
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .roles("USER")
-                .build();
-    }*/
+
 }
+
+
+
+

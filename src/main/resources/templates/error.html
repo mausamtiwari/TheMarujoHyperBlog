@@ -20,7 +20,15 @@
     <div class="error-container text-center bg-white p-4 rounded shadow">
         <h1 class="text-danger">Something went wrong!</h1>
         <p th:text="${errorMessage}"></p>
-        <a href="/" class="btn btn-primary">Home</a>
+        <!-- Check if user is logged in -->
+        <th:block th:if="${session.loggedInUser != null}">
+            <!-- If logged in, redirect to after-login page -->
+            <a href="/afterlogin" class="btn btn-primary">Home</a>
+        </th:block>
+        <th:block th:unless="${session.loggedInUser != null}">
+            <!-- If not logged in, redirect to home page -->
+            <a href="/" class="btn btn-primary">Home</a>
+        </th:block>
     </div>
 </div>
 

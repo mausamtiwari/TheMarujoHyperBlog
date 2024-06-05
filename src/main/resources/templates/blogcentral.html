@@ -2,13 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>BlogCentral-Bootstrap template</title>
     <!-- Favicon-->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/images/Marujo_The_Hyper_Blog_Logo.jpg" />
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="css/styles.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -23,7 +24,6 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="/login">Log in </a></li>
                 <li class="nav-item"><a class="nav-link" href="/register">Register as new Author</a></li>
-                <li class="nav-item"><a class="nav-link" href="/search">Search in blog descriptions</a></li>
                 <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li>
 
             </ul>
@@ -38,6 +38,7 @@
 
             <h2 class="fw-bolder">Welcome to the Marujo HyperBlog</h2>
             <p class="lead mb-0">Below is a list of the most recent posts.</p>
+
         </div>
     </div>
 </header>
@@ -51,6 +52,9 @@
             <!-- Loop through each post in the postList and display it -->
             <div th:each="post : ${postList}" class="post-card p-3 mb-3 border rounded shadow-sm">
                 <h4 th:text="${post.title}"></h4>
+                <!-- If the post has a photo, display it -->
+                <img th:if="${post.postPhoto}" th:src="@{'/uploads/' + ${post.postPhoto}}" class="img-fluid rounded mb-3"
+                     alt="Post Image"/>
                 <p class="text"> Created by: <span th:text="${post.user.username}"></span> Date:  <span th:text="${#dates.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </p>
                 <!-- If the post was updated, display the updated date -->
@@ -68,6 +72,7 @@
 
                 </div>
             </div>
+
             <div th:if="${totalPages > 1}">
                 <div class="row mt-4">
                     <div class="col-sm-12">
@@ -132,11 +137,10 @@
                                 </div>
                             </div>
 
-                            <!-- Add more links as needed -->
-                        </div>
-                    </div>
 
-                </div>
+                <!-- Add more links as needed -->
+
+
             </div>
             <!-- Footer-->
             <footer class="py-5 bg-dark">
@@ -151,25 +155,20 @@
 </div>
 
 <!-- Footer-->
-<footer class="py-5 bg-dark">
-    <div class="container">
-        <!-- Display  MarujoLogo2.jpg from assets folder-->
-        <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/assets/MarujoLogo2small.png}" alt="Marujo Logo" /></div>
-
-
-
-        <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
-        </div>
-
-
-
-</footer>
+            <footer class="py-5 bg-black">
+                <div class="container">
+                    <!-- Display  MarujoLogo2.jpg from assets folder-->
+                    <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/images/Marujo_The_Hyper_Blog_Logo.jpg}" alt="Marujo Logo" /></div>
+                    <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
+                </div>
+            </footer>
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
 <script src="js/scripts.js"></script>
         </div>
 </div>
+
 </div>
 
 
