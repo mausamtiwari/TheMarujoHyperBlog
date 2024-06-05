@@ -94,10 +94,7 @@
                         <!-- Modal body -->
                         <div class="modal-body">
                             <form th:action="@{/saveUpdatedPost/{id}(id=${post.id})}" th:object="${post}" method="post">
-                                <div class="form-group">
-                                    <label for="title">Image:</label>
-                                    <input type="text" class="form-control" id="title" th:field="*{title}">
-                                </div>
+
                                 <div class="form-group">
                                     <label for="title">Title:</label>
                                     <input type="text" class="form-control" id="title" th:field="*{title}">
