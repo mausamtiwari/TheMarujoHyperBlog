@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>BlogCentral-Bootstrap template</title>
+    <title>Search Results</title>
     <!-- Favicon-->
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <!-- Core theme CSS (includes Bootstrap)-->
@@ -37,7 +37,7 @@
         <div class="text-center my-5">
 
             <h2 class="fw-bolder">Welcome to the Marujo HyperBlog</h2>
-            <p class="lead mb-0">Below is a list of the most recent posts.</p>
+            <p class="lead mb-0">Here are your search results.</p>
         </div>
     </div>
 </header>
@@ -49,7 +49,7 @@
         <div class="col-lg-8">
             <h3>Posts</h3>
             <!-- Loop through each post in the postList and display it -->
-            <div th:each="post : ${postList}" class="post-card p-3 mb-3 border rounded shadow-sm">
+            <div th:each="post : ${searchResultList}" class="post-card p-3 mb-3 border rounded shadow-sm">
                 <h4 th:text="${post.title}"></h4>
                 <p class="text"> Created by: <span th:text="${post.user.username}"></span> Date:  <span th:text="${#dates.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </p>
@@ -67,6 +67,9 @@
 
 
                 </div>
+            </div>
+            <div class="text-center">
+            <a class="btn btn-primary" href="javascript:history.back()">Back</a>
             </div>
             <div th:if="${totalPages > 1}">
                 <div class="row mt-4">
@@ -109,27 +112,24 @@
                 <div class="card mb-4">
                     <div class="card-header">Search</div>
                     <div class="card-body">
-
                         <div class="input-group">
                             <form action="/sendSearchString" method="get">
                                 <input class="form-control" type="text" name="searchString" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
                                 <button class="btn btn-primary" id="button-search" type="submit">Go!</button>
                             </form>
                         </div>
-
-
                     </div>
                 </div>
-                <div class="card mb-6">
+                <div class="card mb-4">
                     <div class="card-header">The Marujo community</div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-6">
-                                <div>
-                                    <p>Posts: <span th:text="${postCount}"></span></p>
-                                    <p>Authors: <span th:text="${userCount}"></span></p>
-
-                                </div>
+                                <ul class="list-unstyled mb-0">
+                                    <li><a href="#!">Who is logged in?</a></li>
+                                    <li><a href="#!">Number of visitors</a></li>
+                                    <li><a href="#!">You are the nth visitor</a></li>
+                                </ul>
                             </div>
 
                             <!-- Add more links as needed -->
@@ -140,7 +140,17 @@
             </div>
             <!-- Footer-->
             <footer class="py-5 bg-dark">
-                <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p></div>
+                <div class="container">
+                    <!-- Display  MarujoLogo2.jpg from assets folder-->
+                    <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/assets/MarujoLogo2small.png}" alt="Marujo Logo" /></div>
+
+
+
+                    <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
+                </div>
+
+
+
             </footer>
             <!-- Bootstrap core JS-->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -149,29 +159,6 @@
         </div>
     </div>
 </div>
-
-<!-- Footer-->
-<footer class="py-5 bg-dark">
-    <div class="container">
-        <!-- Display  MarujoLogo2.jpg from assets folder-->
-        <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/assets/MarujoLogo2small.png}" alt="Marujo Logo" /></div>
-
-
-
-        <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
-        </div>
-
-
-
-</footer>
-<!-- Bootstrap core JS-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Core theme JS-->
-<script src="js/scripts.js"></script>
-        </div>
-</div>
-</div>
-
 
 </body>
 </html>

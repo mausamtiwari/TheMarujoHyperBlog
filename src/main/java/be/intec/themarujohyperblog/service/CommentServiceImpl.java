@@ -26,11 +26,13 @@ public class CommentServiceImpl implements CommentService {
     public void saveComment(BlogComment comment) {
         this.commentRepository.save(comment);
     }
+
     @Override
     public BlogComment getCommentById(Long id) {
         Optional<BlogComment> comment = commentRepository.findById(id);
         return comment.orElseThrow(() -> new RuntimeException("Comment not found for id :: " + id));
     }
+
     @Override
     public void deleteCommentById(Long id) {
         boolean exists = commentRepository.existsById(id);

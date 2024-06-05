@@ -51,7 +51,7 @@
             <!-- Display the post -->
             <div class="post-card p-3 mb-3 border rounded shadow-sm">
                 <h3 th:text="${post.title}"></h3>   <!-- Title of the post -->
-                <h1 th:text="${post.description}"></h1>   <!-- Description of the post -->
+                <h4 th:text="${post.description}"></h4>   <!-- Description of the post -->
                 <p class="text-muted"> Created by: <span th:text="${post.getUser().getUsername()}"></span> On:  <span th:text="${#dates.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
                 </p>
                 <p th:if="${post.updatedAt ne post.createdAt}" class="text-muted"> Last updated on: <span
@@ -60,12 +60,15 @@
                 </p>
             <!-- Buttons to edit post, delete post using @GetMapping("/updatePost/{id}" and @PostMapping("/updatePost/{id}")-->
             <div class="mt-3">
-               <!-- goes to page show form with the current post, and a submit button-->
+                <a class="btn btn-primary" href="javascript:history.back()">Back to overview</a>
+
+                <!-- edit button goes to page show form with the current post, and a submit button-->
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editPostModal">
                     Edit Post
                 </button>
-                <form th:action="@{'/deletePost/' + ${post.getId()}}" method="post">
-                    <input type="submit" value="Delete" class="btn btn-danger"/>
+
+                <form th:action="@{'/deletePost/' + ${post.getId()}}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
 
             </div>
@@ -118,7 +121,13 @@
                     <!-- Display the author of the comment -->
                     <p class="text-muted text-right">Comment by: <span th:text="${comment.user.username}"></span></p>
                     <p class="text-muted text-right"> Added on: <span th:text="${#dates.format(comment.updatedAt, 'dd-MM-yyyy HH:mm')}"></span></p>
-                    </div>
+
+                       <!--button to delete the comment-->
+                       <form th:action="@{'/deletePost/' + ${post.getId()}}" method="post" style="display:inline;">
+                           <button type="submit" class="btn btn-primary">Delete</button>
+                       </form>
+
+                   </div>
 
                 <!-- Buttons to edit, delete, and view comments for the post -->
 
@@ -133,10 +142,7 @@
                         </form>
                     </div>
 
-                   <!--button to delete the comment-->
-                    <form th:each="comment : ${commentList}" th:action="@{'/deleteComment/'+${post.id}+'/'+${comment.id}}" method="post">
-                        <input type="submit" value="Delete" class="btn btn-danger"/>
-                    </form>
+
 
 
                 </div>
@@ -179,14 +185,19 @@
         <div class="col-md-4 sidebar-container">
             <div class="sidebar">
                 <h4>Useful stuff</h4>
+
                 <div class="card mb-4">
                     <div class="card-header">Search</div>
                     <div class="card-body">
+
                         <div class="input-group">
-                            <input class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                            <button class="btn btn-primary" id="button-search" type="button">Go!</button>
+                            <form action="/sendSearchString" method="get">
+                                <input class="form-control" type="text" name="searchString" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
+                                <button class="btn btn-primary" id="button-search" type="submit">Go!</button>
+                            </form>
                         </div>
                     </div>
+
                 </div>
                 <div class="card mb-4">
                     <div class="card-header">The Marujo community</div>
@@ -208,7 +219,7 @@
             </div>
             <!-- Footer-->
             <footer class="py-5 bg-dark">
-                <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p></div>
+                <div class="container"><p class="m-0 text-center text-white">Copyright &copy;  Intec Java Class of '23</p></div>
             </footer>
             <!-- Bootstrap core JS-->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
