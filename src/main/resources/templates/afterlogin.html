@@ -134,11 +134,11 @@
         </div>
         <form class="form-inline my-2 my-lg-0">
             <div class="input-group">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search by Title, Tags, Author..."
-                       aria-label="Search">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-success" type="button">Search</button>
-                </div>
+
+                <form action="/sendSearchString" method="get">
+                    <input class="form-control" type="text" name="searchString" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
+                    <button class="btn btn-primary" id="button-search" type="submit">Go!</button>
+                </form>
             </div>
         </form>
         <div class="dropdown">
