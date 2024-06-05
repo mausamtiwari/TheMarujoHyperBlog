@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository; //Mausam??
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<BlogPost, Long> {
@@ -21,6 +20,14 @@ public interface PostRepository extends JpaRepository<BlogPost, Long> {
 
         Page<BlogPost> findByUser(User user, Pageable pageable);
 
-        Page<BlogPost> findByDescriptionContaining(String search, PageRequest of);
-    }
+
+        List<BlogPost> findByDescriptionContaining(String search);
+
+        List<BlogPost> findByContentContaining(String search);
+
+        List<BlogPost> findByTitleContaining(String search);
+
+
+}
+
 

@@ -23,6 +23,8 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
+
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -51,6 +53,9 @@ public class UserServiceImpl implements UserService {
         // user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
+
+
+
 
     @Override
     public void deleteUser(Long userId) {
@@ -88,4 +93,5 @@ public class UserServiceImpl implements UserService {
         return (int) userRepository.count();
     }
 
-}
+
+

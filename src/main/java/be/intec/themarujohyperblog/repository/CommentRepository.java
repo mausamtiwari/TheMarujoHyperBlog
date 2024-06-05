@@ -17,4 +17,5 @@ CommentRepository extends JpaRepository<BlogComment,Long> {
     List<BlogComment> findByPostId(Long postId);
 
     Optional<BlogComment> findByIdAndPostId(Long id, Long postId);
+    Optional<BlogComment> findById(Long id);
 }

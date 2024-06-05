@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,9 +26,13 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.*;
+
+
 
 
 @Service
+
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
@@ -48,8 +53,60 @@ public class PostServiceImpl implements PostService {
         this.commentService = commentService;
     }
 
+       
+
     @Override
     public BlogPost getPostById(Long blogPostId) {
+        Optional<BlogPost> postOptional = postRepository.findById(blogPostId);
+        if (!postOptional.isPresent()) {
+            throw new IllegalStateException("Post not found");
+        }
+        return postOptional.get();
+    }
+
+    @Override
+    public List<BlogPost> getPostsByUser(User user) {
+        return postRepository.findByUser(user);
+    }
+
+    @Override
+    public Page<BlogPost> findUserPostsPaginated(User user, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("createdAt").descending());
+        return this.postRepository.findByUser(user, pageable);
+    }
+
+    @Override
+    public List<BlogPost> getAllPosts() {
+        return postRepository.findAll();
+    }
+
+    @Override
+    public List<BlogPost> searchPostsByTitleDescriptionContentContaining(String search) {
+
+        List<BlogPost> searchDescriptionResult = postRepository.findByDescriptionContaining(search);
+        List<BlogPost> searchContentResult = postRepository.findByContentContaining(search);
+        List<BlogPost> searchTitleResult = postRepository.findByTitleContaining(search);
+
+        //Resultaten in een Set samenvoegen (=unieke waarden) en terug omzetten naar een gewone List:
+
+        Set<BlogPost> searchResultSet = new HashSet<>();
+        searchResultSet.addAll(searchDescriptionResult);
+        searchResultSet.addAll(searchContentResult);
+        searchResultSet.addAll(searchTitleResult);
+
+        List<BlogPost> searchResultList = new ArrayList<>(searchResultSet);
+
+        return searchResultList;
+    }
+
+    @Override
+    public void savePost(BlogPost post) {
+        postRepository.save(post);
+    }
+
+    @Override
+    public BlogPost getPost(Long blogPostId) {
+
         Optional<BlogPost> postOptional = postRepository.findById(blogPostId);
         if (!postOptional.isPresent()) {
             throw new IllegalStateException("Post not found");
@@ -83,14 +140,7 @@ public class PostServiceImpl implements PostService {
         Files.write(path, imageBytes);
     }
 
-    @Override
-    public BlogPost getPost(Long blogPostId) {
-        Optional<BlogPost> postOptional = postRepository.findById(blogPostId);
-        if (!postOptional.isPresent()) {
-            throw new IllegalStateException("Post not found");
-        }
-        return postOptional.get();
-    }
+   
 
     @Override
     public void deletePost(Long id) {
@@ -100,8 +150,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<BlogPost> findPostPaginated(int pageNo, int pageSize) {
         //Default versie, afnemende volgorde
+    public void deletePost(Long id) {
+        postRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<BlogPost> findPostPaginated(int pageNo, int pageSize) {
+        //Default versie, afnemende volgorde
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort); //waarom pageNumber-1?
+        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
         //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
         return this.postRepository.findAll(pageable);
     }
@@ -110,7 +167,7 @@ public class PostServiceImpl implements PostService {
     public Page<BlogPost> findPostPaginatedByIDUp(int pageNo, int pageSize) {
         //Sorteert by ID in toenemende volgorde
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
-        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort); //waarom pageNumber-1?
+        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
         //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
         return this.postRepository.findAll(pageable);
     }
@@ -118,19 +175,23 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<BlogPost> findPostPaginatedByIDDown(int pageNo, int pageSize) {
         //Sorteert by ID in afnemende volgorde
+
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort); //waarom pageNumber-1?
         //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
         return this.postRepository.findAll(pageable);
     }
 
-    @Override
-    public Page<BlogPost> searchPostDescription(String search) {
-        return postRepository.findByDescriptionContaining(search, PageRequest.of(0, 6));
 
+
+
+
+
+    public long countAllBlogPosts() {
+        return (int) postRepository.count();
     }
 
-
+   
 
 
     public int countPosts() {
@@ -155,4 +216,4 @@ public class PostServiceImpl implements PostService {
     public int countLikes(BlogPost post) {
         return post.getLikes().size();
     }
-}
+
