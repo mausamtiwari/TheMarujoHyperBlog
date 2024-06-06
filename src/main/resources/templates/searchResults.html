@@ -109,10 +109,15 @@
         <div class="col-md-4 sidebar-container">
             <div class="sidebar">
                 <h4>Useful stuff</h4>
+
+
+
                 <div class="card mb-4">
                     <div class="card-header">Search</div>
                     <div class="card-body">
+
                         <div class="input-group">
+
                             <form action="/sendSearchString" method="get">
                                 <input class="form-control" type="text" name="searchString" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
                                 <button class="btn btn-primary" id="button-search" type="submit">Go!</button>
@@ -120,17 +125,19 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="card mb-4">
                     <div class="card-header">The Marujo community</div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-6">
-                                <ul class="list-unstyled mb-0">
-                                    <li><a href="#!">Who is logged in?</a></li>
-                                    <li><a href="#!">Number of visitors</a></li>
-                                    <li><a href="#!">You are the nth visitor</a></li>
-                                </ul>
+                                <div>
+                                    <p>Posts: <span th:text="${postCount}"></span></p>
+                                    <p>Authors: <span th:text="${userCount}"></span></p>
+
+                                </div>
                             </div>
+
 
                             <!-- Add more links as needed -->
                         </div>
@@ -139,18 +146,12 @@
                 </div>
             </div>
             <!-- Footer-->
-            <footer class="py-5 bg-dark">
+            <footer class="py-5 bg-black">
                 <div class="container">
                     <!-- Display  MarujoLogo2.jpg from assets folder-->
-                    <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/images/MarujoLogo2small.png}" alt="Marujo Logo" /></div>
-
-
-
+                    <div class="text-center"><img class="img-fluid d-block mx-auto" th:src="@{/images/Marujo_The_Hyper_Blog_Logo.jpg}" alt="Marujo Logo" /></div>
                     <p class="m-0 text-center text-white">Copyright &copy; Intec Java Class of '23</p>
                 </div>
-
-
-
             </footer>
             <!-- Bootstrap core JS-->
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>

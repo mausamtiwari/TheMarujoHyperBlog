@@ -218,20 +218,20 @@
                             </form>
                         </div>
                     </div>
-
-
                 </div>
+
                 <div class="card mb-4">
                     <div class="card-header">The Marujo community</div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-6">
-                                <ul class="list-unstyled mb-0">
-                                    <li>You are logged in as: httpSession.getAttribute('username')</li>
-                                    <li><a href="#!">Number of visitors</a></li>
-                                    <li><a href="#!">You are the nth visitor</a></li>
-                                </ul>
+                                <div>
+                                    <p>Posts: <span th:text="${postCount}"></span></p>
+                                    <p>Authors: <span th:text="${userCount}"></span></p>
+
+                                </div>
                             </div>
+
 
                             <!-- Add more links as needed -->
                         </div>
