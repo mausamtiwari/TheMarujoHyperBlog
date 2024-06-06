@@ -4,6 +4,7 @@ import be.intec.themarujohyperblog.model.BlogComment;
 import be.intec.themarujohyperblog.model.BlogPost;
 import be.intec.themarujohyperblog.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,18 +15,15 @@ import java.util.List;
 @Controller
 public class CommentController {
 
-    private final CommentServiceImpl commentService;
 
-    private final PostServiceImpl postService;
+    private final CommentService commentService;
+    private PostServiceImpl postService;
 
-    private final UserServiceImpl userService;
-
-    @Autowired
-    public CommentController(CommentServiceImpl commentService, PostServiceImpl postService, UserServiceImpl userService) {
+    public CommentController(CommentService commentService, @Lazy PostServiceImpl postService) {
         this.commentService = commentService;
         this.postService = postService;
-        this.userService = userService;
     }
+
 
     //Handles GET request for displaying all comments for a specific post
    //JDR: this will be handled in the post controller
@@ -72,7 +70,7 @@ public class CommentController {
     public String updateComment(@PathVariable(value = "blogpostId") Long postId,
                                 @PathVariable(value = "blogcommentId") Long commentId,
                                 @ModelAttribute("comment") BlogComment comment) {
-        BlogComment existingComment = commentService.getCommentById(commentId);
+        BlogComment existingComment = commentService.findCommentById(commentId);
         existingComment.setText(comment.getText());
         commentService.saveComment(existingComment);
         return "redirect:/blog_post/" + postId + "/blog_comment";
@@ -84,7 +82,7 @@ public class CommentController {
     @GetMapping("/blog_post/{blogpostId}/blog_comment/{blogcommentId}/delete")
     public String deleteComment(@PathVariable(value = "blogpostId") Long postId,
                                 @PathVariable(value = "blogcommentId") Long commentId) {
-        commentService.deleteCommentById(commentId);
+        commentService.deleteComment(commentId);
         return "redirect:/blog_post/" + postId + "/blog_comment";
     }
     */

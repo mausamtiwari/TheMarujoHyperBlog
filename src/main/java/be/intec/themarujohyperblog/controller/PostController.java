@@ -1,96 +1,5 @@
-/*package be.intec.themarujohyperblog.controller;
 
-import be.intec.themarujohyperblog.model.BlogPost;
-import be.intec.themarujohyperblog.model.User;
-import be.intec.themarujohyperblog.service.PostService;
-import be.intec.themarujohyperblog.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
-
-@Controller
-public class PostController {
-
-    private final PostService postService;
-
-    private  final UserService userService;
-
-    @Autowired
-    public PostController(PostService postService, UserService userService) {
-        this.postService = postService;
-        this.userService = userService;
-    }
-
-    @GetMapping("/")
-    public String index(Model model) {
-        List<BlogPost> posts = postService.findAll();
-        model.addAttribute("posts", posts);
-        return "blogcentral";
-    }
-
-    @GetMapping("/posts/{id}")
-    public String viewPost(@PathVariable Long id, Model model) {
-        BlogPost post = postService.findById(id);
-        model.addAttribute("post", post);
-        return "post";
-    }
-
-    @GetMapping("/create_post")
-    public String createPost(Model model) {
-        model.addAttribute("post", new BlogPost());
-        return "create_post";
-    }
-
-    @PostMapping("/create_post")
-    public String savePost(BlogPost post) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
-
-        post.setUser(user);
-        post.setCreatedAt(new Date());
-        postService.saveBlogPost(post);
-        return "redirect:/";
-    }
-
-    @GetMapping("/edit_post/{id}")
-    public String editPost(@PathVariable Long id, Model model) {
-        BlogPost post = postService.findById(id);
-        model.addAttribute("post", post);
-        return "create_post";
-    }
-
-    @PostMapping("/edit-post/{id}")
-    public String updatePost(@PathVariable Long id, BlogPost post) {
-        BlogPost existingPost = postService.findById(id);
-        existingPost.setTitle(post.getTitle());
-        existingPost.setContent(post.getContent());
-        postService.saveBlogPost(existingPost);
-        return "redirect:/posts/" + id;
-    }
-
-    @GetMapping("/delete-post/{id}")
-    public String deletePost(@PathVariable Long id) {
-        BlogPost post = postService.findById(id);
-        postService.delete(post);
-        return "redirect:/";
-    }
-
-    @PostMapping("/like-post/{id}")
-    public String likePost(@PathVariable Long id) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByUserName(username).orElseThrow(() -> new IllegalArgumentException("Invalid username: " + username));
-
-        BlogPost post = postService.findById(id);
-        user.getLikedPosts().add(post);
-        userService.saveUser(user);
-        return "redirect:/posts/" + id;
-    }
-}*/
 
 package be.intec.themarujohyperblog.controller;
 
@@ -115,21 +24,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-import static org.springframework.util.ClassUtils.isPresent;
-
-import java.io.IOException;
+import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -140,17 +40,18 @@ public class PostController {
     private final LikeServiceImpl likeService;
 
     private final UserRepository userRepository;
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    private final CommentServiceImpl commentServiceImpl;
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
 
+    private final CommentServiceImpl commentService;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
+  
     @Autowired
-    public PostController(PostServiceImpl postService, UserServiceImpl userService, CommentServiceImpl commentService, UserRepository userRepository, LikeServiceImpl likeService, CommentServiceImpl commentServiceImpl) {
-        this.postService = postService;
+    public PostController( UserServiceImpl userService, LikeServiceImpl likeService, UserRepository userRepository, CommentServiceImpl commentService) {
         this.userService = userService;
         this.likeService = likeService;
         this.userRepository = userRepository;
-        this.commentServiceImpl = commentServiceImpl;
+        this.commentService = commentService;
     }
 
     @Autowired
@@ -176,6 +77,60 @@ public class PostController {
         return "createpost";
     }
 
+   /* @PostMapping("/createPost")
+    public String createPost(@ModelAttribute("post") BlogPost post, @RequestParam("image") MultipartFile imageFile, HttpSession session, Model model) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            logger.warn("User session not found, redirecting to login.");
+            return "redirect:/login";
+        }
+
+        if (post.getDescription() == null || post.getDescription().trim().isEmpty()) {
+            post.setDescription("No description available");
+        }
+
+        if (!imageFile.isEmpty()) {
+            try {
+                byte[] imageData = imageFile.getBytes();
+
+                // Logging image size
+                long imageSize = imageData.length;
+                logger.info("Uploaded image size: {} bytes", imageSize);
+
+                // Ensure image size does not exceed 10MB
+                if (imageSize > 10 * 1024 * 1024) {
+                    logger.error("File size exceeds 10MB limit.");
+                    model.addAttribute("error", "File size exceeds 10MB limit.");
+                    // You may also want to return to the form with the previously entered data
+                    return "createpost";
+                }
+
+                post.setImageData(imageData);
+            } catch (IOException e) {
+                logger.error("Error processing image upload: {}", e.getMessage(), e);
+                model.addAttribute("error", "Error processing image upload.");
+                // Return to the form with an error message
+                return "createpost";
+            }
+        }
+
+        try {
+            logger.info("Creating post for user: {}", user.getUsername());
+            post.setCreatedAt(new Date());
+            post.setUpdatedAt(new Date());
+            post.setUser(user);
+            postService.savePost(post);
+        } catch (Exception e) {
+            logger.error("Error saving post: {}", e.getMessage(), e);
+            model.addAttribute("error", "Error saving post.");
+            // Return to the form with an error message
+            return "createpost";
+        }
+
+        // Redirect to the user's post list page after successful creation
+        return "posts";
+    }*/
+
     @PostMapping("/createPost")
     public String createPost(@ModelAttribute("post") BlogPost post, @RequestParam("file") MultipartFile file, HttpSession session, Model model) {
         User user = (User) session.getAttribute("loggedInUser");
@@ -183,6 +138,8 @@ public class PostController {
             logger.warn("User session not found, redirecting to login.");
             return "redirect:/login";
         }
+
+
         // Handle file upload
         if (!file.isEmpty()) {
             String uploadError = handleFileUpload(file, post);
@@ -191,6 +148,9 @@ public class PostController {
                 return "redirect:/createpost"; // Adjust the view name as necessary
             }
         }
+
+
+
         List<BlogPost> userPosts = postService.getPostsByUser(user);
 
         logger.info("Creating post for user: {}", user.getUsername());
@@ -198,8 +158,11 @@ public class PostController {
         post.setUpdatedAt(new Date());//JDR
         post.setUser(user);
         postService.savePost(post);
+       
         return "redirect:/afterlogin"; // Adjust the view name as necessary
+
     }
+
     private String handleFileUpload(MultipartFile file, BlogPost post) {
         try {
             byte[] bytes = file.getBytes();
@@ -213,11 +176,11 @@ public class PostController {
         }
     }
 
-
     @GetMapping("/afterlogin")
     public String afterLogin(
             @RequestParam(name = "page", defaultValue = "1") int pageNo,
             Model model, HttpSession session) {
+
 
         int pageSize = 6; // number of posts per page
         Page<BlogPost> postPage = postService.findPostPaginated(pageNo, pageSize);
@@ -232,6 +195,9 @@ public class PostController {
     }
 
 
+ 
+
+
     @GetMapping("/myPosts")
     public String viewUserPosts(Model model, HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
@@ -243,11 +209,13 @@ public class PostController {
         return "userposts";
     }
 
+  
+   
 
     @GetMapping("/updatePost/{postId}")
 
     public String showUpdatePostForm(@PathVariable("postId") Long postId, Model model) {
-        //Authorisation gebeurt in PostMapping, niet mogelijk hier httpsession te krijgen
+    //Authorisation gebeurt in PostMapping, niet mogelijk hier httpsession te krijgen
 
         BlogPost post = postService.getPostById(postId);
 
@@ -257,7 +225,9 @@ public class PostController {
         return "redirect:/saveUpdatedPost/{postId}";
     }
 
+
     @PostMapping("/saveUpdatedPost/{postId}")
+
     public String updatePost(@PathVariable("postId") Long postId, @ModelAttribute("post") BlogPost post, HttpSession session) {
         //Check voor niet-ingelogde visitor
         User user = (User) session.getAttribute("loggedInUser");
@@ -267,29 +237,34 @@ public class PostController {
         BlogPost existingPost = postService.getPostById(postId);
 
         //check of de session id == post.user.id
-        if (!Objects.equals(post.getUser().getId(), user.getId())) {
+        if (!Objects.equals(existingPost.getUser().getId(), user.getId())) {
             //niet geauthoriseerd: post behoort niet tot de user
             return "redirect:/notAuthorised";
         }  else {
 
-            existingPost.setTitle(post.getTitle());
-            existingPost.setDescription(post.getDescription());
-            existingPost.setContent(post.getContent());
-            //existingPost.setComments(post.getComments());
-            existingPost.setUpdatedAt(new Date());
-            postService.savePost(existingPost);
+        existingPost.setTitle(post.getTitle());
+        existingPost.setDescription(post.getDescription());
+        existingPost.setContent(post.getContent());
+        //existingPost.setComments(post.getComments());
+        existingPost.setUpdatedAt(new Date());
+        postService.savePost(existingPost);
 
         }
+
         return "redirect:/viewPost/{postId}";
     }
+
     //delete post and check the identity of the logged user
     @PostMapping("/deletePost/{id}")
+  
+  
     public String deletePost(@PathVariable("id") Long postId, HttpSession session) {
         //get session identity
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
             return "redirect:/notAuthorised";
-        };
+        }
+        ;
         BlogPost post = postService.getPostById(postId);
         //check if the post belongs to the user:
         if (!Objects.equals(post.getUser().getId(), user.getId())) {
@@ -300,64 +275,62 @@ public class PostController {
         }
         return "redirect:/myPosts";
 
+
     }
 
     //delete blogpost comment for a specific postid and check the identity of the logged user
     @PostMapping("/deleteComment/{postId}/{commentId}")
-    public String deleteComment(@PathVariable("commentId") Long postId, Long commentId,  HttpSession session) {
+    public String deleteComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId, HttpSession session) {
         //get session identity
         User user = (User) session.getAttribute("loggedInUser");
         if (user == null) {
             return "redirect:/notAuthorised";
-        };
-        BlogComment comment = commentServiceImpl.getCommentById(commentId);
+        }
+        BlogComment comment = commentService.getCommentById(commentId);
         //check if the comment belongs to the user:
         if (!Objects.equals(comment.getUser().getId(), user.getId())) {
             //niet geauthoriseerd: comment behoort niet tot de user
             return "redirect:/notAuthorised";
         } else {
-            commentServiceImpl.deleteCommentById(commentId);
+            commentService.deleteCommentById(commentId);
         }
         return "redirect:/viewPost/" + postId;
+
     }
+    //delete blogpost comment for a specific postid and check the identity of the logged user
 
 
-    @PostMapping("/likePost/{id}")
-    public String likePost(@PathVariable Long id, HttpSession session) {
-        User sessionUser = (User) session.getAttribute("loggedInUser");
-        if (sessionUser == null) {
-            return "redirect:/login";
-        }
-        Optional<User> user = userRepository.findByUsername(sessionUser.getUsername());
-        if (user.isPresent()) {
-            postService.likeOrUnlikePost(id, user.get());
-        }
-        return "redirect:/viewPost/" + id;
+
+    @PostMapping("/like")
+    @ResponseBody
+    public Like likePost(@RequestBody Like like) {
+        return likeService.saveLike(like);
     }
 
-    @GetMapping("/stats")
-    public ResponseEntity<Map<String, Long>> getStats() {
-        Map<String, Long> stats = new HashMap<>();
-        stats.put("postCount", postService.countPosts());
-        stats.put("userCount", userService.countUsers());
-        return ResponseEntity.ok(stats);
+    @DeleteMapping("/unlike/{id}")
+    @ResponseBody
+    public void unlikePost(@PathVariable("id") Long id) {
+        likeService.deleteLike(id);
     }
-    @GetMapping("/userposts")
-    public List<BlogPost> getPosts(@RequestParam(required = false) String sortBy) {
+
+    @GetMapping("/posts")
+    public List<BlogPost> getPosts(@RequestParam String sortBy) {
         List<BlogPost> posts = postService.getAllPosts();
 
-        if ("recent".equals(sortBy)) {
-            posts.sort(Comparator.comparing(BlogPost::getDate, Comparator.nullsLast(Comparator.reverseOrder())));
-        } else if ("oldest".equals(sortBy)) {
-            posts.sort(Comparator.comparing(BlogPost::getDate, Comparator.nullsLast(Comparator.naturalOrder())));
+        if (sortBy.equals("recent")) {
+            posts.sort(Comparator.comparing(BlogPost::getDate).reversed());
+        } else if (sortBy.equals("oldest")) {
+            posts.sort(Comparator.comparing(BlogPost::getDate));
+        } else if (sortBy.equals("popularity")) {
+            posts.sort(Comparator.comparing(BlogPost::getPopularity).reversed());
         }
 
         return posts;
     }
 
-
     @GetMapping("/page/{pageNo}")
     public String findPostPaginated(@PathVariable(value = "pageNo") int pageNo, Model model) {
+
 
         int pageSize = 6; //aantal posts op één pagina is 6;
         Page<BlogPost> page = postService.findPostPaginated(pageNo, pageSize);
@@ -369,6 +342,7 @@ public class PostController {
         return "blogcentral";
     }
 
+
     //method om individuele post te bekijken en de bijhorende comments in de vorm van pageable list en findCommentPaginated
     @GetMapping("/viewPost/{id}")
     public String viewPost(@PathVariable("id") Long id,
@@ -379,7 +353,7 @@ public class PostController {
 
         // Alle comments toevoegen aan het model als pageable
         int pageSize = 5; // Set the number of comments per page
-        Page<BlogComment> page = commentServiceImpl.findCommentPaginated(id, pageNo, pageSize);
+        Page<BlogComment> page = commentService.findCommentPaginated(id, pageNo, pageSize);
         List<BlogComment> commentList = page.getContent();
 
         model.addAttribute("currentPage", pageNo);
@@ -407,24 +381,50 @@ public class PostController {
         newComment.setUser(user);
         newComment.setPost(post);
 
-        commentServiceImpl.saveComment(newComment);
+        commentService.saveComment(newComment);
         return "redirect:/viewPost/" + postId;
     }
 
     //get mapping to retrieve the number of posts and number of users in the database
+    @GetMapping("/stats")
+    public String getStats(Model model) {
+        long postCount = postService.countAllBlogPosts();
+        long userCount = userService.countUsers();
+        model.addAttribute("postCount", postCount);
+        model.addAttribute("userCount", userCount);
+        return "stats";
+    }
 
     @GetMapping("/notAuthorised")
     public String notAuthorised() {
         return "notauthorised";
     }
 
+
+
+
     //PostMapping used in blogcentral.html to search blogpost description and content
-    @GetMapping("/sendSearchString")
+        @GetMapping("/sendSearchString")
     public String sendSearchString(@RequestParam("searchString") String searchString, Model model) {
         List<BlogPost> searchResultList = postService.searchPostsByTitleDescriptionContentContaining(searchString);
         model.addAttribute("searchResultList", searchResultList);
         return "searchResults";
     }
 
-}
 
+
+
+
+    @PostMapping("/likePost/{id}")
+    public String likePost(@PathVariable Long id, HttpSession session) {
+        User sessionUser = (User) session.getAttribute("loggedInUser");
+        if (sessionUser == null) {
+            return "redirect:/login";
+        }
+        Optional<User> user = userRepository.findByUsername(sessionUser.getUsername());
+        if (user.isPresent()) {
+            postService.likeOrUnlikePost(id, user.get());
+        }
+        return "redirect:/viewPost/" + id;
+    }
+}

@@ -5,31 +5,46 @@ import be.intec.themarujohyperblog.model.Like;
 import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.repository.LikeRepository;
 import be.intec.themarujohyperblog.repository.PostRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 import java.util.*;
 
 
+
+
 @Service
-public  class PostServiceImpl implements PostService{
-    private final LikeRepository likeRepository;
+
+public class PostServiceImpl implements PostService {
+
     private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
+    private CommentServiceImpl commentService;
+
 
     @Autowired
-    public PostServiceImpl(LikeRepository likeRepository, PostRepository postRepository) {
-        this.likeRepository = likeRepository;
+    public PostServiceImpl(PostRepository postRepository, LikeRepository likeRepository) {
         this.postRepository = postRepository;
+        this.likeRepository = likeRepository;
     }
+
+    @Autowired
+    public void setCommentService(CommentServiceImpl commentService) {
+        this.commentService = commentService;
+    }
+
 
     @Override
     public BlogPost getPostById(Long blogPostId) {
@@ -55,10 +70,11 @@ public  class PostServiceImpl implements PostService{
     public List<BlogPost> getAllPosts() {
         return postRepository.findAll();
     }
+
     @Override
     public List<BlogPost> searchPostsByTitleDescriptionContentContaining(String search) {
 
-        List<BlogPost> searchDescriptionResult = (List<BlogPost>) postRepository.findByDescriptionContaining(search, Pageable.unpaged());
+        List<BlogPost> searchDescriptionResult = postRepository.findByDescriptionContaining(search);
         List<BlogPost> searchContentResult = postRepository.findByContentContaining(search);
         List<BlogPost> searchTitleResult = postRepository.findByTitleContaining(search);
 
@@ -73,6 +89,7 @@ public  class PostServiceImpl implements PostService{
 
         return searchResultList;
     }
+
     @Override
     public void savePost(BlogPost post) {
         postRepository.save(post);
@@ -80,6 +97,7 @@ public  class PostServiceImpl implements PostService{
 
     @Override
     public BlogPost getPost(Long blogPostId) {
+
         Optional<BlogPost> postOptional = postRepository.findById(blogPostId);
         if (!postOptional.isPresent()) {
             throw new IllegalStateException("Post not found");
@@ -88,7 +106,12 @@ public  class PostServiceImpl implements PostService{
     }
 
 
-    @Override
+    public void saveImage(byte[] imageBytes, String imagePath) throws IOException {
+        Path path = Paths.get(imagePath);
+        Files.write(path, imageBytes);
+    }
+
+
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
@@ -97,20 +120,16 @@ public  class PostServiceImpl implements PostService{
     public Page<BlogPost> findPostPaginated(int pageNo, int pageSize) {
         //Default versie, afnemende volgorde
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort); //waarom pageNumber-1?
         //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
         return this.postRepository.findAll(pageable);
     }
 
-    public void saveImage(byte[] imageBytes, String imagePath) throws IOException {
-        Path path = Paths.get(imagePath);
-        Files.write(path, imageBytes);
-    }
     @Override
     public Page<BlogPost> findPostPaginatedByIDUp(int pageNo, int pageSize) {
         //Sorteert by ID in toenemende volgorde
         Sort sort = Sort.by(Sort.Direction.ASC, "id");
-        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort); //waarom pageNumber-1?
         //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
         return this.postRepository.findAll(pageable);
     }
@@ -118,33 +137,24 @@ public  class PostServiceImpl implements PostService{
     @Override
     public Page<BlogPost> findPostPaginatedByIDDown(int pageNo, int pageSize) {
         //Sorteert by ID in afnemende volgorde
+
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort); //waarom pageNumber-1?
         //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
         return this.postRepository.findAll(pageable);
     }
 
-    @Override
-    public Page<BlogPost> searchPostDescription(String search) {
-        return null;
-    }
 
-    @Override
-    public List<BlogPost> getSortedPosts(String sortBy) {
-        Sort sort;
-        if ("recent".equals(sortBy)) {
-            sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        } else if ("oldest".equals(sortBy)) {
-            sort = Sort.by(Sort.Direction.ASC, "createdAt");
-        } else {
-            sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        }
-        return postRepository.findAll(sort);
-    }
-    public long countPosts() {
 
+    public long countAllBlogPosts() {
         return (int) postRepository.count();
     }
+
+
+    public long countPosts() {
+        return (int) postRepository.count();
+    }
+
     @Override
     @Transactional
     public void likeOrUnlikePost(Long postId, User user) {
@@ -160,82 +170,13 @@ public  class PostServiceImpl implements PostService{
             likeRepository.save(like);
         }
     }
+
     public int countLikes(BlogPost post) {
         return post.getLikes().size();
     }
 
-    //missing?
-    //end missing methods?
-/*
-    @Override
-    public List<BlogPost> getAllPosts() {
-        return postRepository.findAll();
-    }
-
-    @Override
-    public void savePost(BlogPost post) {
-        postRepository.save(post);
-    }
-
-
-    @Override
-    public List<BlogPost> getPostsByUser(User user) {
-        return postRepository.findByUser(user);
-    }
-
-    public BlogPost getPostById(Long blogPostId) {
-        Optional<BlogPost> postOptional = postRepository.findById(blogPostId);
-        if (!postOptional.isPresent()) {
-            throw new IllegalStateException("Post not found");
-        }
-        return postOptional.get();
-    }
-
-
-
-
-    @Override
-    public void deletePost(Long id) {
-        postRepository.deleteById(id);
-
-    }
-
-    @Override
-    public Page<BlogPost> findPostPaginated(int pageNo, int pageSize) {
-        //Default versie, afnemende volgorde
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
-        //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
-        return this.postRepository.findAll(pageable);
-    }
-
-
-    @Override
-    public Page<BlogPost> findPostPaginatedByIDUp(int pageNo, int pageSize) {
-        //Sorteert by ID in toenemende volgorde
-        Sort sort = Sort.by(Sort.Direction.ASC, "id");
-        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
-        //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
-        return this.postRepository.findAll(pageable);
-    }
-
-    @Override
-    public Page<BlogPost> findPostPaginatedByIDDown(int pageNo, int pageSize) {
-        //Sorteert by ID in afnemende volgorde
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(pageNo-1 , pageSize, sort); //waarom pageNumber-1?
-        //Pageable is een interface, het object bevat instructies voor welke paginas, hoeveel informatie, en de sortering is ook mogelijk.
-        return this.postRepository.findAll(pageable);
-    }
-
-    @Override
-    public Page<BlogPost> findUserPostsPaginated(User user, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo - 1, pageSize, Sort.by("createdAt").descending());
-        return this.postRepository.findByUser(user, pageable);
-    }
-
-    @Override
-    public Page<BlogPost> searchPostDescription(String search) {
-        return postRepository.findByDescriptionContaining(search, PageRequest.of(0, 6));
-    }*/
 }
+
+
+
+

@@ -16,7 +16,9 @@ spring:
       ddl-auto: update
   servlet:
     multipart:
+
       enabled : true
+
       max-file-size: 10MB
       max-request-size: 10MB
   security:
@@ -37,7 +39,7 @@ spring:
     username: mausamtiwari93@gmail.com
     password: bchkcgsicerwxknr  # This is a hashed password for smtp (app password)
     properties:
-      mail:
+       mail:
         debug: true
         smtp:
           auth: true       # specify whether the authentication should be used when connecting to the smtp server
@@ -54,3 +56,9 @@ logging:
 server:
   tomcat:
     max-http-form-post-size: 10MB
+
+
+
+
+
+

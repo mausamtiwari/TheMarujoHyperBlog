@@ -1,8 +1,12 @@
 package be.intec.themarujohyperblog.service;
 
+import be.intec.themarujohyperblog.controller.UserController;
 import be.intec.themarujohyperblog.model.User;
 import be.intec.themarujohyperblog.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -13,24 +17,22 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    //private final BCryptPasswordEncoder passwordEncoder;
 
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
+        //this.passwordEncoder = passwordEncoder;
     }
-
 
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-
- /*  @Override
-    public void registerUser(User user) {
-        userRepository.save(user);
-    }*/
 
     @Override
     public void registerUser(User user) {
@@ -46,12 +48,14 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+    public User save(User user) {
+        // user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
 
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    @Override
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
     }
 
     @Override
@@ -66,10 +70,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Validated(User.UpdateGroup.class)
-    public User updateUser(@Validated(User.UpdateGroup.class) User user) {
+    public void updateUser(@Validated(User.UpdateGroup.class) User user) {
         //user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        return user;
     }
 
     @Override
@@ -86,4 +89,9 @@ public class UserServiceImpl implements UserService {
         return (int) userRepository.count();
     }
 
+
 }
+
+
+
+

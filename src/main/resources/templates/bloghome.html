@@ -81,7 +81,6 @@
                     <span id="user-name" class="user-name"></span>
                 </div>
                 <hr>
-                <div class="sidebar-container">
                     <div class="sidebar-container">
                         <h2>Statistics</h2>
                         <p>Number of Posts: <span id="postCount"></span></p>
@@ -216,7 +215,9 @@
         sortPosts({ value: 'recent' });
     });
 
+
     function fetchStatistics() {
+        console.log('Fetching statistics...'); // Log a message indicating that statistics are being fetched
         fetch('/stats')
             .then(response => {
                 if (!response.ok) {
@@ -225,6 +226,7 @@
                 return response.json();
             })
             .then(data => {
+                console.log('Statistics data received:', data); // Log the received data
                 if (data.userCount !== undefined && data.postCount !== undefined) {
                     $('#postCount').text(data.postCount);
                     $('#userCount').text(data.userCount);
@@ -238,6 +240,7 @@
     }
 
     $(document).ready(function() {
+        console.log('Document ready, fetching statistics...'); // Log a message indicating that the document is ready
         fetchStatistics();
         setInterval(fetchStatistics, 60000);
     });

@@ -66,20 +66,20 @@
                         th:text="${#dates.format(post.updatedAt, 'dd-MM-yyyy HH:mm')}"></span></p> <!-- If the post was updated, display the updated date -->
                 <p class="text"> Content: <span th:text="${post.content}"></span>
                 </p>
-                <!-- Buttons to edit post, delete post using @GetMapping("/updatePost/{id}" and @PostMapping("/updatePost/{id}")-->
-                <div class="mt-3">
-                    <a class="btn btn-primary" href="javascript:history.back()">Back to overview</a>
+            <!-- Buttons to edit post, delete post using @GetMapping("/updatePost/{id}" and @PostMapping("/updatePost/{id}")-->
+            <div class="mt-3">
+                <a class="btn btn-primary" href="javascript:history.back()">Back to overview</a>
 
-                    <!-- edit button goes to page show form with the current post, and a submit button-->
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editPostModal">
-                        Edit Post
-                    </button>
+                <!-- edit button goes to page show form with the current post, and a submit button-->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editPostModal">
+                    Edit Post
+                </button>
 
-                    <form th:action="@{'/deletePost/' + ${post.getId()}}" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+                <form th:action="@{'/deletePost/' + ${post.getId()}}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
 
-                </div>
+            </div>
             </div>
             <!-- The Modal -->
             <div class="modal" id="editPostModal">
@@ -126,18 +126,18 @@
                 <h3>Comments</h3>
                 <!-- Content of the comment -->
 
-                <div th:each="comment : ${commentList}" class="comment-card p-3 mb-3 border rounded shadow-sm">
+                   <div th:each="comment : ${commentList}" class="comment-card p-3 mb-3 border rounded shadow-sm">
                     <p th:text="${comment.getText()}"></p>
                     <!-- Display the author of the comment -->
                     <p class="text-muted text-right">Comment by: <span th:text="${comment.user.username}"></span></p>
                     <p class="text-muted text-right"> Added on: <span th:text="${#dates.format(comment.updatedAt, 'dd-MM-yyyy HH:mm')}"></span></p>
 
-                    <!--button to delete the comment-->
-                    <form th:action="@{'/deleteComment/' + ${post.getId()}+'/'+${comment.getId()}}" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-primary">Delete</button>
-                    </form>
+                       <!--button to delete the comment-->
+                       <form th:action="@{'/deleteComment/' + ${post.getId()}+'/'+${comment.getId()}}" method="post" style="display:inline;">
+                           <button type="submit" class="btn btn-primary">Delete</button>
+                       </form>
 
-                </div>
+                   </div>
 
                 <!-- Buttons to edit, delete, and view comments for the post -->
 
