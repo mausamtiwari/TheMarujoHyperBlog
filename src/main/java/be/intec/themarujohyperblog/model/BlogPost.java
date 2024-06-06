@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
+import java.time.LocalDateTime;
+
 import java.util.List;
 
 @Entity
@@ -18,7 +20,7 @@ public class BlogPost extends AuditModel {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = true) // description toegevoegd, anders is het moeilijk een search te doen op inhoud.
+    @Column(nullable = true)
     private String description;
 
     @Lob
@@ -41,32 +43,33 @@ public class BlogPost extends AuditModel {
     @Column(name = "post_photo")
     private String postPhoto;
 
+    @Lob
+    @Column(name = "image_data", columnDefinition = "LONGBLOB")
+    private byte[] imageData;
+    @Column(nullable = true)
+    private LocalDateTime date;
     // Default constructor
     public BlogPost() {}
 
-    public BlogPost(Long id, String title, String description, String content) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.content = content;
-    }
-
     // Constructor with all fields
-    public BlogPost(Long id, @NotNull String title, String content, User user) {
+    public BlogPost(Long id, @NotNull String title, String description, String content, User user, byte[] imageData, LocalDateTime date) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.content = content;
         this.user = user;
+        this.imageData = imageData;
+        this.date = date;
     }
-
-
 
     // Constructor without id
-    public BlogPost(@NotNull String title, String content, User user) {
+    public BlogPost(@NotNull String title, String description, String content, User user, byte[] imageData, LocalDateTime date) {
         this.title = title;
+        this.description = description;
         this.content = content;
         this.user = user;
+        this.imageData = imageData;
+        this.date = date;
     }
 
     // Getters and Setters
@@ -86,10 +89,13 @@ public class BlogPost extends AuditModel {
         this.title = title;
     }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
-    public void setDescription(String description) { this.description = description; }
-
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getContent() {
         return content;
@@ -146,4 +152,26 @@ public class BlogPost extends AuditModel {
     public void setLikes(List<Like> likes) {
         this.likes = likes;
     }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
+
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
+    }
+
+    public int getPopularity() {
+        return likes != null ? likes.size() : 0;
+    }
+
 }
+

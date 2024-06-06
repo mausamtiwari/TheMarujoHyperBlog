@@ -6,8 +6,7 @@ import be.intec.themarujohyperblog.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -47,12 +46,12 @@ public class UserServiceImpl implements UserService {
     }
 
 
+
     @Override
     public User save(User user) {
         // user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
-
 
     @Override
     public void deleteUser(Long userId) {
@@ -86,11 +85,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsernameAndPassword(username, password);
     }
 
-    public int countUsers() {
+    public long countUsers() {
         return (int) userRepository.count();
     }
 
+
 }
+
 
 
 
