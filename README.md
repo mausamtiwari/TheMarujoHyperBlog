@@ -7,7 +7,7 @@
 ![BootStrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
 
 ## Overview
-Blog Central is a platform where visitors can read and search blogs, and registered users can write, edit, and comment on blog posts.
+Marujo is a platform where visitors can read and search blogs, and registered users can write, edit, and comment on blog posts.
 
 ## Technologies Used
 - Java: For the back-end logic.
